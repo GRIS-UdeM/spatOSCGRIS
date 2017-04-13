@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>SchemeUserState</key>
+	<dict>
+		<key>SpatOSCGRIS (AU).xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
+		<key>SpatOSCGRIS (All).xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>0</integer>
+		</dict>
+		<key>SpatOSCGRIS (Shared Code).xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
+		<key>SpatOSCGRIS (VST).xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>393C0150A824E41AD7F111AA</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>8F512E19D8CC360A7B8302A3</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>B2B1E08E61BE48384C921A8D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>F298949E4E6E5D0BEDF19CD7</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+	</dict>
+</dict>
+</plist>
