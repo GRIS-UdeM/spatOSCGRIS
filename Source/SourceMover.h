@@ -76,7 +76,10 @@ public:
     }*/
     
 private:
+    void setEqualAngles();
+    void setEqualRadiusAndAngles();
     void sortAngles();
+    
     
     SpatGrisAudioProcessor * filter;
     MouvementMode   mouvementModeSelect;
@@ -84,7 +87,7 @@ private:
     
     Array<FPoint>   listSourceXY;
     Array<FPoint>   listSourceRayAng;
-    Array<float>   listAngSourceSorted;
+    Array<float>    listAngSourceSorted;
     //AudioParameterChoice * mouvementChoiceAuto;
     /*MoverType mMoverType;
     int mSelectedSrc;

@@ -48,6 +48,21 @@ SourceMover::~SourceMover()
 void SourceMover::setMouvementMode(MouvementMode m)
 {
     this->mouvementModeSelect = m;
+    
+    switch (this->mouvementModeSelect) {
+
+        case CircularFixAng:{
+            this->setEqualAngles();
+            break;
+        }
+            
+            
+        case CircularFullyFix:{
+            this->setEqualRadiusAndAngles();
+            break;
+        }
+            
+    }
     //*this->mouvementChoiceAuto = (int)m;
 }
 //============================================================================
@@ -66,66 +81,52 @@ void SourceMover::setSourcesPosition(PositionSourceSpeaker pss)
             clockwise = true;
             break;
         }
-
         case LeftCounterClockW:{
             break;
         }
-
         case TopClockW:{
             startAtTop = true;
             clockwise = true;
             break;
         }
-
         case TopCounterClockW:{
             startAtTop = true;
             break;
         }
-
     }
+    
     float anglePerSp = ThetaMax / this->filter->getNumSourceUsed();
     if (alternate) {
-        float offset = startAtTop
-        ? (clockwise ? QuarterCircle : (QuarterCircle - anglePerSp))
-        : (QuarterCircle - anglePerSp/2);
+        float offset = startAtTop ?
+            (clockwise ? QuarterCircle : (QuarterCircle - anglePerSp))
+        :   (QuarterCircle - anglePerSp/2);
+        
         float start = offset;
-        for (int i = clockwise ? 0 : 1; i < this->filter->getNumSourceUsed(); i += 2) {
-            
+        
+        for (int i = clockwise ? 0 : 1; i < this->filter->getNumSourceUsed(); i += 2){
             FPoint xy = GetXYFromRayAng(1.0f, offset);
             this->filter->setPosXYSource(i, xy.x, xy.y);
             offset -= anglePerSp;
         }
         
         offset = start + anglePerSp;
-        for (int i = clockwise ? 1 : 0; i < this->filter->getNumSourceUsed(); i += 2) {
+        
+        for (int i = clockwise ? 1 : 0; i < this->filter->getNumSourceUsed(); i += 2){
             FPoint xy = GetXYFromRayAng(1.0f, offset);
             this->filter->setPosXYSource(i, xy.x, xy.y);
-
             offset += anglePerSp;
         }
-    } else {
-        float offset = startAtTop ? QuarterCircle : QuarterCircle + anglePerSp/2;
+    }
+    else {
+        float offset = startAtTop ? QuarterCircle : (QuarterCircle + anglePerSp/2);
         float delta = clockwise ? -anglePerSp : anglePerSp;
-        for (int i = 0; i < this->filter->getNumSourceUsed(); i++) {
+        
+        for (int i = 0; i < this->filter->getNumSourceUsed(); i++){
             FPoint xy = GetXYFromRayAng(1.0f, offset);
             this->filter->setPosXYSource(i, xy.x, xy.y);
             offset += delta;
         }
     }
-    
-    /*for (int i = 0; i < this->filter->getNumSourceUsed(); ++i) {
-        
-        FPoint sourceP = this->filter->getXYSource(i);
-        float ray = GetRaySpat(sourceP.x, sourceP.y);
-        float ang = GetAngleSpat(sourceP.x, sourceP.y);
-            
-        ray = 1;
-        ang = (i*0.3f);
-            
-        FPoint xy = GetXYFromRayAng(ray, ang);
-        this->filter->setPosXYSource(i, xy.x, xy.y, false);
-
-    }*/
 }
 
 void SourceMover::beginMouvement()
@@ -144,7 +145,6 @@ void SourceMover::updateSourcesPosition(int iSource, float x, float y)
     FPoint currSelectSXY        = FPoint(x,y);
     FPoint currSelectSRayAng    = FPoint(GetRaySpat(x, y), GetAngleSpat(x, y));
     FPoint deltaMasterPos;
-    
     
     
     switch (this->mouvementModeSelect) {
@@ -207,10 +207,11 @@ void SourceMover::updateSourcesPosition(int iSource, float x, float y)
                 FPoint newCurSrcPosRT = this->listSourceRayAng[i] + deltaMasterPos;
                 NormalizeSourceMoverRayAng(newCurSrcPosRT);
                 
-                FPoint xy = GetXYFromRayAng(newCurSrcPosRT.x, currSelectSRayAng.y);
+                FPoint xy = GetXYFromRayAng(newCurSrcPosRT.x, newCurSrcPosRT.y);
                 this->filter->setPosXYSource(i, xy.x, xy.y, false);
             }
             break;
+
         }
             
             
@@ -224,7 +225,7 @@ void SourceMover::updateSourcesPosition(int iSource, float x, float y)
                 FPoint newCurSrcPosRT = this->listSourceRayAng[i] + deltaMasterPos;
                 NormalizeSourceMoverRayAng(newCurSrcPosRT);
                 
-                FPoint xy = GetXYFromRayAng(currSelectSRayAng.x, currSelectSRayAng.y);
+                FPoint xy = GetXYFromRayAng(newCurSrcPosRT.x, newCurSrcPosRT.y);
                 this->filter->setPosXYSource(i, xy.x, xy.y, false);
             }
             break;
@@ -290,6 +291,50 @@ void SourceMover::updateSourcesPosition(int iSource, float x, float y)
 }
 
 //==================================================================================================
+void SourceMover::setEqualAngles()
+{
+    this->sortAngles();
+    
+    //then set them
+    FPoint selSrcRT = this->filter->getRayAngleSource(this->filter->getSelectItem()->selectID);
+    for (int iCurSrc = 0; iCurSrc < this->filter->getNumSourceUsed(); iCurSrc++) {
+        if (iCurSrc == this->filter->getSelectItem()->selectID){
+            continue;
+        }
+        FPoint curSrcRT = this->filter->getRayAngleSource(iCurSrc);
+        curSrcRT.y = selSrcRT.y + this->listAngSourceSorted[iCurSrc];
+        NormalizeSourceMoverRayAng(curSrcRT);
+        
+        FPoint xy = GetXYFromRayAng(curSrcRT.x, curSrcRT.y);
+        this->filter->setPosXYSource(iCurSrc, xy.x, xy.y, false);
+
+        /*mFilter->setPreventSourceLocationUpdate(true);
+        mFilter->setSourceRT(iCurSrc, curSrcRT, false);
+        storeDownPosition(iCurSrc, curSrcRT);
+        mFilter->setPreventSourceLocationUpdate(false);*/
+        
+    }
+}
+
+void SourceMover::setEqualRadiusAndAngles()
+{
+    this->sortAngles();
+    
+    FPoint selSrcRT = this->filter->getRayAngleSource(this->filter->getSelectItem()->selectID);
+    for (int iCurSrc = 0; iCurSrc < this->filter->getNumSourceUsed(); iCurSrc++) {
+        if (iCurSrc == this->filter->getSelectItem()->selectID){
+            continue;
+        }
+        FPoint curSrcRT = this->filter->getRayAngleSource(iCurSrc);
+        curSrcRT.x = selSrcRT.x;
+        curSrcRT.y = selSrcRT.y + this->listAngSourceSorted[iCurSrc];
+        NormalizeSourceMoverRayAng(curSrcRT);
+        
+        FPoint xy = GetXYFromRayAng(curSrcRT.x, curSrcRT.y);
+        this->filter->setPosXYSource(iCurSrc, xy.x, xy.y, false);
+    }
+}
+
 void SourceMover::sortAngles()
 {
     int iNbrSrc = this->filter->getNumSourceUsed();
