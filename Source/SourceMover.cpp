@@ -105,7 +105,7 @@ void SourceMover::setSourcesPosition(PositionSourceSpeaker pss)
         
         for (int i = clockwise ? 0 : 1; i < this->filter->getNumSourceUsed(); i += 2){
             FPoint xy = GetXYFromRayAng(1.0f, offset);
-            this->filter->setPosXYSource(i, xy.x, xy.y);
+            this->filter->setPosXYSource(i, xy.x, xy.y, false);
             offset -= anglePerSp;
         }
         
@@ -113,7 +113,7 @@ void SourceMover::setSourcesPosition(PositionSourceSpeaker pss)
         
         for (int i = clockwise ? 1 : 0; i < this->filter->getNumSourceUsed(); i += 2){
             FPoint xy = GetXYFromRayAng(1.0f, offset);
-            this->filter->setPosXYSource(i, xy.x, xy.y);
+            this->filter->setPosXYSource(i, xy.x, xy.y, false);
             offset += anglePerSp;
         }
     }
@@ -123,7 +123,7 @@ void SourceMover::setSourcesPosition(PositionSourceSpeaker pss)
         
         for (int i = 0; i < this->filter->getNumSourceUsed(); i++){
             FPoint xy = GetXYFromRayAng(1.0f, offset);
-            this->filter->setPosXYSource(i, xy.x, xy.y);
+            this->filter->setPosXYSource(i, xy.x, xy.y, false);
             offset += delta;
         }
     }
