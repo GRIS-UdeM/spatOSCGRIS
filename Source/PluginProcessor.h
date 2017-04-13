@@ -136,6 +136,7 @@ public:
 
     SelectItem * getSelectItem() { return this->selectItem; }
     
+    //----
     bool getLinkSurface()   { return this->linkSurface; }
     bool getLinkAzimuth()   { return this->linkAzimuth; }
     bool getLinkElevation() { return this->linkElevation; }
@@ -143,6 +144,15 @@ public:
     void setLinkSurface(bool v)     { this->linkSurface = v; }
     void setLinkAzimuth(bool v)     { this->linkAzimuth = v; }
     void setLinkElevation(bool v)   { this->linkElevation = v; }
+    
+    //----
+    bool            getOscOn()              { return this->oscOn; }
+    unsigned int    getOscFirstIdSource()   { return this->oscFirstIdSource; }
+    unsigned int    getOscPort()            { return this->oscPort; }
+    
+    void setOscOn(bool v)                   { this->oscOn = v; }
+    void setOscFirstIdSource(unsigned int v){ this->oscFirstIdSource = v; }
+    void setOscPort(unsigned int v)         { this->oscPort = v; }
     //==============================================================================
     
     
@@ -171,16 +181,21 @@ private:
     
     SelectItem * selectItem;
     
-    bool linkSurface;
-    bool linkAzimuth;
-    bool linkElevation;
+    bool linkSurface    = false;
+    bool linkAzimuth    = false;
+    bool linkElevation  = false;
     
     //Trajectory param========================
     SourceMover     * sourceMover;
     Trajectory      * trajectory;
-    
-    
     //========================================
+    
+    //OSC param========================
+    bool            oscOn               = true;
+    unsigned int    oscFirstIdSource    = 1;
+    unsigned int    oscPort             = 18032;
+    //========================================
+    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpatGrisAudioProcessor)
 };

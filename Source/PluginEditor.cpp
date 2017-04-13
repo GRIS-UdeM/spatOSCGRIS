@@ -43,8 +43,8 @@ SpatGrisAudioProcessorEditor::SpatGrisAudioProcessorEditor(SpatGrisAudioProcesso
     this->boxSourceParam = new Box(&this->grisFeel, "Source parameters");
     this->addAndMakeVisible(this->boxSourceParam);
     
-    this->boxOutputParam = new Box(&this->grisFeel, "Output parameters");
-    this->addAndMakeVisible(this->boxOutputParam);
+    ///this->boxOutputParam = new Box(&this->grisFeel, "Output parameters");
+    //this->addAndMakeVisible(this->boxOutputParam);
     
     this->boxTrajectory = new Box(&this->grisFeel, "Trajectories");
     this->addAndMakeVisible(this->boxTrajectory);
@@ -53,45 +53,25 @@ SpatGrisAudioProcessorEditor::SpatGrisAudioProcessorEditor(SpatGrisAudioProcesso
     this->octTab = new OctTabbedComponent(&this->grisFeel, TabbedButtonBar::TabsAtTop, this->filter);
 
     this->octTab->addTab("Settings",           this->grisFeel.getBackgroundColour(), new Component(), true);
-    this->octTab->addTab("Volume & Filters",   this->grisFeel.getBackgroundColour(), new Component(), true);
+    //this->octTab->addTab("Volume & Filters",   this->grisFeel.getBackgroundColour(), new Component(), true);
     this->octTab->addTab("Sources",            this->grisFeel.getBackgroundColour(), new Component(), true);
-   	this->octTab->addTab("Speakers",           this->grisFeel.getBackgroundColour(), new Component(), true);
+   	//this->octTab->addTab("Speakers",           this->grisFeel.getBackgroundColour(), new Component(), true);
     this->octTab->addTab("Interfaces",         this->grisFeel.getBackgroundColour(), new Component(), true);
     this->octTab->setTabBarDepth(28);
     this->addAndMakeVisible(this->octTab);
     
     
     //Add All Component-------------------------------------------------------------------------------------
+    this->labAzimSpan           = addLabel("Azimuth Span", "Azimuth Span Master Soutce", 0, 10, DefaultLabWidth, DefaultLabHeight, this->boxSourceParam->getContent());
+    this->togLinkAzimSpan       = addToggleButton("Link", "Link other sources", 90, 8, DefaultLabWidth, DefaultLabHeight,  this->boxSourceParam->getContent());
+    this->sliAzimSpan           = addSlider("", "", 4, 30, 180, DefaultLabHeight, this->boxSourceParam->getContent(), MinAzimSource, MaxAzimSource, ShowSliderInter);
     
-    //Source param
-    this->labSurfaceOrPan       = addLabel("Surface", "Surface Master Soutce", 0, 0, DefaultLabWidth, DefaultLabHeight, this->boxSourceParam->getContent());
-    this->togLinkSurfaceOrPan   = addToggleButton("Link", "Link other sources", 0, 20, DefaultLabWidth, DefaultLabHeight,  this->boxSourceParam->getContent());
-    this->sliSurfaceOrPan       = addSlider("", "", 50, 18, 130, DefaultLabHeight, this->boxSourceParam->getContent(), MinSurfSource, MaxSurfSource, DefaultSliderInter);
-    
-    this->labAzimSpan           = addLabel("Azimuth Span", "Azimuth Span Master Soutce", 0, 50, DefaultLabWidth, DefaultLabHeight, this->boxSourceParam->getContent());
-    this->togLinkAzimSpan       = addToggleButton("Link", "Link other sources", 0, 70, DefaultLabWidth, DefaultLabHeight,  this->boxSourceParam->getContent());
-    this->sliAzimSpan           = addSlider("", "", 50, 68, 130, DefaultLabHeight, this->boxSourceParam->getContent(), MinAzimSource, MaxAzimSource, DefaultSliderInter);
-    
-    this->labElevSpan           = addLabel("Elevation Span", "Elevation Span Master Soutce", 0, 100, DefaultLabWidth, DefaultLabHeight, this->boxSourceParam->getContent());
-    this->togLinkElevSpan       = addToggleButton("Link", "Link other sources", 0, 120, DefaultLabWidth, DefaultLabHeight,  this->boxSourceParam->getContent());
-    this->sliAElevSpann         = addSlider("", "", 50, 118, 130, DefaultLabHeight, this->boxSourceParam->getContent(), MinElevSource, MaxElevSource, DefaultSliderInter);
+    this->labElevSpan           = addLabel("Elevation Span", "Elevation Span Master Soutce", 0, 70, DefaultLabWidth, DefaultLabHeight, this->boxSourceParam->getContent());
+    this->togLinkElevSpan       = addToggleButton("Link", "Link other sources", 90, 68, DefaultLabWidth, DefaultLabHeight,  this->boxSourceParam->getContent());
+    this->sliAElevSpann         = addSlider("", "", 4, 90, 180, DefaultLabHeight, this->boxSourceParam->getContent(), MinElevSource, MaxElevSource, ShowSliderInter);
     //-----------------------------
-    
-    
-    //Outputs param
-    this->vecLevelOut = vector<LevelComponent *>();
-    int x = 2;
-    for(int i = 0; i < MaxSpeakers; i++){
-        juce::Rectangle<int> level(x, 2, SizeWidthLevelComp, 134);
-        
-        LevelComponent * lvC = new LevelComponent(this->filter, &this->grisFeel, i+1);
-        lvC->setBounds(level);
-        this->boxOutputParam->getContent()->addAndMakeVisible(lvC);
-        this->vecLevelOut.push_back(lvC);
-        
-        x+=SizeWidthLevelComp;
-    }
-    //-----------------------------
+
+
     
     
     //Trajectories
@@ -124,7 +104,7 @@ SpatGrisAudioProcessorEditor::SpatGrisAudioProcessorEditor(SpatGrisAudioProcesso
     this->boxTrajectory->getContent()->addAndMakeVisible(this->progressBarTraject);
     this->progressBarTraject->setVisible(false);
     
-    this->sliSpeedTrajectory = addSlider("Speed :", "Speed of trajectory", 14, 150, 204, DefaultLabHeight, this->boxTrajectory->getContent(), MinSpeedTrajectory, MaxSpeedTrajectory,  0.001f, juce::Slider::TextEntryBoxPosition::TextBoxLeft);
+    this->sliSpeedTrajectory = addSlider("Speed :", "Speed of trajectory", 14, 150, 204, DefaultLabHeight, this->boxTrajectory->getContent(), MinSpeedTrajectory, MaxSpeedTrajectory,  ShowSliderInter);
     
     //Other param Trajectories hided---
     int rowX = 260;
@@ -151,7 +131,7 @@ SpatGrisAudioProcessorEditor::SpatGrisAudioProcessorEditor(SpatGrisAudioProcesso
     this->texTrajPendDevia = addTextEditor("", "", "Deviation (0-360)", rowX+80, 114, 40, DefaultLabHeight, this->boxTrajectory->getContent());
     
     this->labTrajRandSpeed = addLabel("Speed :", "Speed Random", rowX-5, 30, 80, DefaultLabHeight, this->boxTrajectory->getContent());
-    this->sliTrajRandSpeed = addSlider("Speed :", "Speed Random", rowX+48, 30, 160, DefaultLabHeight, this->boxTrajectory->getContent(), MinTrajRandomSpeed, MaxTrajRandomSpeed,  0.01f, juce::Slider::TextEntryBoxPosition::TextBoxLeft);
+    this->sliTrajRandSpeed = addSlider("Speed :", "Speed Random", rowX+48, 30, 160, DefaultLabHeight, this->boxTrajectory->getContent(), MinTrajRandomSpeed, MaxTrajRandomSpeed,  0.01f);
     this->togTrajRandSepare = addToggleButton("Separate sources :", "Force separate automation sources", rowX, 50, DefaultLabWidth, DefaultLabHeight,  this->boxTrajectory->getContent());
 
     //Add in list for lock
@@ -187,27 +167,25 @@ SpatGrisAudioProcessorEditor::SpatGrisAudioProcessorEditor(SpatGrisAudioProcesso
     }
     this->comTypeProcess->setSelectedId(1);
     
-    this->labInOutMode      = addLabel("Input/Output :", "Input/Output mode", 0, 30, DefaultLabWidth, DefaultLabHeight, settingsBox);
-    this->comInOutMode      = addComboBox("", "Input/Output mode", 90, 30, DefaultLabWidth, DefaultLabHeight, settingsBox);
-    this->butInOutMode      = addButton("Apply", "Apply Input/Output mode", 214, 30, 60, DefaultLabHeight, settingsBox);
+    this->labInOutMode      = addLabel("Input :", "Input mode", 0, 30, DefaultLabWidth, DefaultLabHeight, settingsBox);
+    this->comInOutMode      = addComboBox("", "Input mode", 60, 30, DefaultLabWidth-40, DefaultLabHeight, settingsBox);
+    this->butInOutMode      = addButton("Apply", "Apply Input/Output mode", 150, 30, 60, DefaultLabHeight, settingsBox);
     
     
-    this->togOSCActive      = addToggleButton("OSC On/Off", "OSC Active (On/Off)", 280, 4, DefaultLabWidth, DefaultLabHeight, settingsBox);
-    this->labOSCSourceIDF   = addLabel("OSC 1er ID :", "OSC 1er Source ID", 280, 30, DefaultLabWidth, DefaultLabHeight, settingsBox);
-    this->texOSCSourceIDF   = addTextEditor("", "", "OSC 1er Source ID", 360, 30, 60, DefaultLabHeight, settingsBox);
+    this->togOSCActive      = addToggleButton("OSC On/Off", "OSC Active (On/Off)", 4, 60, DefaultLabWidth, DefaultLabHeight, settingsBox);
+    this->togOSCActive->setToggleState(this->filter->getOscOn(), dontSendNotification);
     
-    this->labOSCPort        = addLabel("OSC Port :", "OSC Port", 280, 50, DefaultLabWidth, DefaultLabHeight, settingsBox);
-    this->texOSCPort        = addTextEditor("", "", "OSC Port", 360, 50, 60, DefaultLabHeight, settingsBox);
+    this->labOSCSourceIDF   = addLabel("OSC 1er ID :", "OSC 1er Source ID", 4, 80, DefaultLabWidth, DefaultLabHeight, settingsBox);
+    this->texOSCSourceIDF   = addTextEditor("", "", "OSC 1er Source ID", 80, 80, 60, DefaultLabHeight, settingsBox);
+    this->texOSCSourceIDF->setText(String(this->filter->getOscFirstIdSource()));
     
-    //Volume and Filter
-    //-----------------------------
-    Component * volumeFBox = this->octTab->getTabContentComponent(1);
-    addLabel("Comming soon...", "", 0, 4, DefaultLabWidth, DefaultLabHeight, volumeFBox);
-    
+    this->labOSCPort        = addLabel("OSC Port :", "OSC Port", 4, 100, DefaultLabWidth, DefaultLabHeight, settingsBox);
+    this->texOSCPort        = addTextEditor("", "", "OSC Port", 80, 100, 60, DefaultLabHeight, settingsBox);
+    this->texOSCPort->setText(String(this->filter->getOscPort()));
     
     //Sources
     //-----------------------------
-    Component * sourcesBox = this->octTab->getTabContentComponent(2);
+    Component * sourcesBox = this->octTab->getTabContentComponent(1);
     this->labSourcePos          = addLabel("Source position :", "Source position", 0, 4, DefaultLabWidth, DefaultLabHeight, sourcesBox);
     this->comSourcePos          = addComboBox("", "Source position", 110, 4, DefaultLabWidth+20, DefaultLabHeight, sourcesBox);
     for(int i = 0; i  < PositionSourceSpeaker::SIZE_PSS; i++){
@@ -230,16 +208,10 @@ SpatGrisAudioProcessorEditor::SpatGrisAudioProcessorEditor(SpatGrisAudioProcesso
     this->comSourceSelectAngle  = addTextEditor("","", "Angle (0 - 360)", 50, 70, 70, DefaultLabHeight, sourcesBox);
     this->labSourceInfoAngle    = addLabel("(0 - 360)", "", 120, 70, DefaultLabWidth, DefaultLabHeight, sourcesBox);
     
-    
-    //Speakers
-    //-----------------------------
-    Component * speakersBox = this->octTab->getTabContentComponent(3);
-    addLabel("Comming soon...", "", 0, 4, DefaultLabWidth, DefaultLabHeight, speakersBox);
-    
-    
+
     //Interfaces
     //-----------------------------
-    Component * interfaceBox = this->octTab->getTabContentComponent(4);
+    Component * interfaceBox = this->octTab->getTabContentComponent(2);
     addLabel("Comming soon...", "", 0, 4, DefaultLabWidth, DefaultLabHeight, interfaceBox);
     //------------------------------------------------------------------------------------------------------
     
@@ -267,13 +239,10 @@ SpatGrisAudioProcessorEditor::~SpatGrisAudioProcessorEditor()
         delete (it);
     }
     
-    //delete this->sourceMover;
-    
     delete this->progressBarTraject;
     
     delete this->spatFieldComp;
     delete this->boxSourceParam;
-    delete this->boxOutputParam;
     delete this->boxTrajectory;
     delete this->octTab;
 }
@@ -374,13 +343,13 @@ ComboBox* SpatGrisAudioProcessorEditor::addComboBox(const String &s, const Strin
 //==============================================================================
 void SpatGrisAudioProcessorEditor::updateSourceParam()
 {
-    this->togLinkSurfaceOrPan->setToggleState(this->filter->getLinkSurface(),   dontSendNotification);
+    //this->togLinkSurfaceOrPan->setToggleState(this->filter->getLinkSurface(),   dontSendNotification);
     this->togLinkAzimSpan->setToggleState(this->filter->getLinkAzimuth(),       dontSendNotification);
     this->togLinkElevSpan->setToggleState(this->filter->getLinkElevation(),     dontSendNotification);
     
     const int idS = this->filter->getSelectItem()->selectID;
-    this->sliSurfaceOrPan->setValue(*(this->filter->getListSource().at(idS)->getSurf()),dontSendNotification);
-    this->sliSurfaceOrPan->setTooltip("S:"+String(this->sliSurfaceOrPan->getValue(),2));
+    //this->sliSurfaceOrPan->setValue(*(this->filter->getListSource().at(idS)->getSurf()),dontSendNotification);
+    //this->sliSurfaceOrPan->setTooltip("S:"+String(this->sliSurfaceOrPan->getValue(),2));
     
     this->sliAzimSpan->setValue(*(this->filter->getListSource().at(idS)->getAzim()),    dontSendNotification);
     this->sliAzimSpan->setTooltip("A:"+String(this->sliAzimSpan->getValue(),2));
@@ -450,39 +419,10 @@ void SpatGrisAudioProcessorEditor::updateTrajectoryParam()
 
 void SpatGrisAudioProcessorEditor::updateInputOutputMode()
 {
-    int iMaxSources = this->filter->getTotalNumInputChannels();
-    int iMaxSpeakers  = this->filter->getTotalNumOutputChannels();
-    
-    
-    if (iMaxSpeakers >=1)  { this->comInOutMode->addItem("1x1",  1);  }
-    if (iMaxSpeakers >=2)  { this->comInOutMode->addItem("1x2",  2);  }
-    if (iMaxSpeakers >=4)  { this->comInOutMode->addItem("1x4",  3);  }
-    if (iMaxSpeakers >=6)  { this->comInOutMode->addItem("1x6",  4);  }
-    if (iMaxSpeakers >=8)  { this->comInOutMode->addItem("1x8",  5);  }
-    if (iMaxSpeakers >=12) { this->comInOutMode->addItem("1x12", 7); }
-    if (iMaxSpeakers >=16) { this->comInOutMode->addItem("1x16", 8); }
-    
-    if (iMaxSources >=2 && iMaxSpeakers >=2)  { this->comInOutMode->addItem("2x2",  9);  }  //the id here cannot be 0
-    if (iMaxSources >=2 && iMaxSpeakers >=4)  { this->comInOutMode->addItem("2x4",  10);  }
-    if (iMaxSources >=2 && iMaxSpeakers >=6)  { this->comInOutMode->addItem("2x6",  11);  }
-    if (iMaxSources >=2 && iMaxSpeakers >=8)  { this->comInOutMode->addItem("2x8",  12);  }
-    if (iMaxSources >=2 && iMaxSpeakers >=12) { this->comInOutMode->addItem("2x12", 13); }
-    if (iMaxSources >=2 && iMaxSpeakers >=16) { this->comInOutMode->addItem("2x16", 14); }
-    
-    if (iMaxSources >=4 && iMaxSpeakers >=4)  { this->comInOutMode->addItem("4x4",  15);  }
-    if (iMaxSources >=4 && iMaxSpeakers >=6)  { this->comInOutMode->addItem("4x6",  16);  }
-    if (iMaxSources >=4 && iMaxSpeakers >=8)  { this->comInOutMode->addItem("4x8",  17);  }
-    if (iMaxSources >=4 && iMaxSpeakers >=12) { this->comInOutMode->addItem("4x12", 18); }
-    if (iMaxSources >=4 && iMaxSpeakers >=16) { this->comInOutMode->addItem("4x16", 19); }
-    
-    if (iMaxSources >=6 && iMaxSpeakers >=6)  { this->comInOutMode->addItem("6x6",  20);  }
-    if (iMaxSources >=6 && iMaxSpeakers >=8)  { this->comInOutMode->addItem("6x8",  21);  }
-    if (iMaxSources >=6 && iMaxSpeakers >=12) { this->comInOutMode->addItem("6x12", 22); }
-    if (iMaxSources >=6 && iMaxSpeakers >=16) { this->comInOutMode->addItem("6x16", 23); }
-    
-    if (iMaxSources >=8 && iMaxSpeakers >=8)  { this->comInOutMode->addItem("8x8",  24);  }
-    if (iMaxSources >=8 && iMaxSpeakers >=12) { this->comInOutMode->addItem("8x12", 25); }
-    if (iMaxSources >=8 && iMaxSpeakers >=16) { this->comInOutMode->addItem("8x16", 26); }
+
+    for(int i = 0; i  < this->filter->getTotalNumInputChannels(); i++){
+        this->comInOutMode->addItem(String(i+1),  i+1);
+    }
     
     this->comSourceSelectPos->clear();
     for(int i = 0; i  < this->filter->getNumSourceUsed(); i++){
@@ -503,11 +443,11 @@ void SpatGrisAudioProcessorEditor::updateSelectSource()
 
 void SpatGrisAudioProcessorEditor::buttonClicked (Button *button)
 {
-    if(this->togLinkSurfaceOrPan == button){
+    /*if(this->togLinkSurfaceOrPan == button){
         this->filter->setLinkSurface(this->togLinkSurfaceOrPan->getToggleState());
         
-    }
-    else if(this->togLinkAzimSpan == button){
+    }*/
+    if(this->togLinkAzimSpan == button){
         this->filter->setLinkAzimuth(this->togLinkAzimSpan->getToggleState());
         
     }
@@ -531,12 +471,12 @@ void SpatGrisAudioProcessorEditor::buttonClicked (Button *button)
 void SpatGrisAudioProcessorEditor::sliderValueChanged (Slider *slider)
 {
     
-    if(this->sliSurfaceOrPan == slider){
+    /*if(this->sliSurfaceOrPan == slider){
         this->filter->setSurfaceValue(this->sliSurfaceOrPan->getValue());
         this->sliSurfaceOrPan->setTooltip("S:"+String(this->sliSurfaceOrPan->getValue(),2));
         
-    }
-    else if(this->sliAzimSpan == slider){
+    }*/
+    if(this->sliAzimSpan == slider){
         this->filter->setAzimuthValue(this->sliAzimSpan->getValue());
         this->sliAzimSpan->setTooltip("A:"+String(this->sliAzimSpan->getValue(),2));
         
@@ -709,15 +649,16 @@ void SpatGrisAudioProcessorEditor::resized()
     this->boxSourceParam->correctSize(CenterColumnWidth, 140);
     
     x += CenterColumnWidth + Margin + Margin;
-    this->boxOutputParam->setBounds(x, y, w-(fieldSize+ CenterColumnWidth + (Margin * 7)), 160);
-    this->boxOutputParam->correctSize(((unsigned int )this->vecLevelOut.size()*(SizeWidthLevelComp))+4, 130);
+    this->octTab->setBounds(x, y, w-(fieldSize+ CenterColumnWidth + (Margin * 7)), 160);
+    //this->boxOutputParam->setBounds(x, y, w-(fieldSize+ CenterColumnWidth + (Margin * 7)), 160);
+    //this->boxOutputParam->correctSize(((unsigned int )this->vecLevelOut.size()*(SizeWidthLevelComp))+4, 130);
     
     x = Margin + fieldSize + Margin + Margin;
     this->boxTrajectory->setBounds(x, 170, w-(fieldSize + (Margin * 5)), 200);
     this->boxTrajectory->correctSize(510, 170);    //w-(fieldSize + (Margin * 5))
     
     //OctTabbedComponent-----------------------
-    this->octTab->setBounds(x, 170+210, w-(fieldSize + (Margin * 4)), h - (170+200+(Margin*6)) );
+    //this->octTab->setBounds(x, 170+210, w-(fieldSize + (Margin * 4)), h - (170+200+(Margin*6)) );
 
     
     this->resizer->setBounds (w - 16, h - 16, 16, 16);

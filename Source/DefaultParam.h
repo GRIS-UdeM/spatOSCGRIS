@@ -116,16 +116,17 @@ static const float  DefTrajRandomSpeed   = 0.5f;
 //--------------------------------------------------
 //UI Param
 //--------------------------------------------------
-static const float  DefaultSliderInter   = 0.00001f;
+static const float  DefaultSliderInter  = 0.00001f;
+static const float  ShowSliderInter     = 0.001f;
 
 static const int    Margin             = 2;
 static const int    CenterColumnWidth  = 180;
-static const int    MinFieldSize       = 300;
+static const int    MinFieldSize       = 400;
 static const int    RightColumnWidth   = 340;
 static const int    SizeWidthLevelComp = 22;
 
-static const int    DefaultUItWidth     = 1090;
-static const int    DefaultUIHeight     = 540;
+static const int    DefaultUItWidth     = 920;
+static const int    DefaultUIHeight     = 400;
 
 static const int    DefaultTexWidth     = 60;
 static const int    DefaultLabWidth     = 120;

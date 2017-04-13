@@ -81,7 +81,7 @@ private :
     TextButton*     addButton(const String &s, const String &stooltip, int x, int y, int w, int h, Component *into);
     ToggleButton*   addToggleButton(const String &s, const String &stooltip, int x, int y, int w, int h, Component *into, bool toggle = false);
     TextEditor*     addTextEditor(const String &s, const String &emptyS, const String &stooltip, int x, int y, int w, int h, Component *into, int wLab = 80);
-    Slider*         addSlider(const String &s, const String &stooltip, int x, int y, int w, int h, Component *into, float minF, float maxF, float defF, juce::Slider::TextEntryBoxPosition tebp = juce::Slider::TextEntryBoxPosition::NoTextBox);
+    Slider*         addSlider(const String &s, const String &stooltip, int x, int y, int w, int h, Component *into, float minF, float maxF, float defF, juce::Slider::TextEntryBoxPosition tebp = juce::Slider::TextEntryBoxPosition::TextBoxLeft);
     ComboBox*       addComboBox(const String &s, const String &stooltip, int x, int y, int w, int h, Component *into);
     //==============================================================================
     
@@ -97,16 +97,13 @@ private :
     SpatComponent   * spatFieldComp;
     
     Box             * boxSourceParam;
-    Box             * boxOutputParam;
+    //Box             * boxOutputParam;
     Box             * boxTrajectory;
     
     OctTabbedComponent  * octTab;
     
     //Component------------------------------------
     //For Source param-----------------
-    Label           * labSurfaceOrPan;
-    ToggleButton    * togLinkSurfaceOrPan;
-    Slider          * sliSurfaceOrPan;
     
     Label           * labAzimSpan;
     ToggleButton    * togLinkAzimSpan;
