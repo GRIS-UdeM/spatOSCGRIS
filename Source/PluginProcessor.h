@@ -158,6 +158,7 @@ public:
     
     //==============================================================================
     void setPosXYSource(int idS, float x, float y, bool updateAll = true);
+    FPoint getXYSource(int idS);
     FPoint getRayAngleSource(int idS);
     
     void setSurfaceValue(float surf);

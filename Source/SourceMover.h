@@ -49,7 +49,8 @@ public:
     void setMouvementMode(MouvementMode m);
     
     //==================================================
-    void setSourcesPosition();
+    void setSourcesPosition(PositionSourceSpeaker pss = LeftAlternate);
+    
     void beginMouvement();
     
     //==================================================
@@ -75,11 +76,15 @@ public:
     }*/
     
 private:
+    void sortAngles();
+    
     SpatGrisAudioProcessor * filter;
     MouvementMode   mouvementModeSelect;
     StringArray     listMouvement;
     
+    Array<FPoint>   listSourceXY;
     Array<FPoint>   listSourceRayAng;
+    Array<float>   listAngSourceSorted;
     //AudioParameterChoice * mouvementChoiceAuto;
     /*MoverType mMoverType;
     int mSelectedSrc;

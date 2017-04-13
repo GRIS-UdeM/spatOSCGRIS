@@ -21,6 +21,7 @@ typedef enum {
     SelectedSource,
     SelectedSpeaker
 } SelectionType;
+
 struct SelectItem {
     unsigned int selectID;
     SelectionType selecType;
@@ -67,6 +68,13 @@ typedef enum {
     TopCounterClockW,
     SIZE_PSS
 } PositionSourceSpeaker;
+
+
+typedef struct {
+    int     i;
+    float   a;
+} IndexedAngle;
+
 
 //--------------------------------------------------
 //Param
@@ -179,6 +187,32 @@ static void NormalizeScreenWithSpat(FPoint &p, float w)
     p.y = -(p.y - SourceRadius - w) / (w/2.0f);
 }
 
+static void NormalizeSourceMoverRayAng(FPoint &newCurSrcPosRT)
+{
+    if (newCurSrcPosRT.x < 0.0f){
+        newCurSrcPosRT.x = 0.0f;
+    }
+    if (newCurSrcPosRT.x > RadiusMax){
+        newCurSrcPosRT.x = RadiusMax;
+    }
+    if (newCurSrcPosRT.y < 0.0f){
+        newCurSrcPosRT.y += ThetaMax;
+    }
+    if (newCurSrcPosRT.y > ThetaMax){
+        newCurSrcPosRT.y -= ThetaMax;
+    }
+}
+
+static void NormalizeSourceMoverXY(FPoint &newCurSrcPosRT)
+{
+    FPoint correctedRA =  FPoint(GetRaySpat(newCurSrcPosRT.x,newCurSrcPosRT.y), GetAngleSpat(newCurSrcPosRT.x,newCurSrcPosRT.y));
+    NormalizeSourceMoverRayAng(correctedRA);
+    correctedRA = GetXYFromRayAng(correctedRA.x, correctedRA.y);
+    newCurSrcPosRT.x = correctedRA.getX();
+    newCurSrcPosRT.y = correctedRA.getY();
+}
+
+
 static FPoint DegreeToXy (FPoint p, int FieldWidth)
 {
     float x,y;
@@ -209,6 +243,16 @@ static FPoint GetSourceAzimElev(FPoint pXY, bool bUseCosElev = false)
     
     return FPoint(fAzim, fElev);
 }
+
+
+static int IndexedAngleCompare(const void *a, const void *b)
+{
+    IndexedAngle *ia = (IndexedAngle*)a;
+    IndexedAngle *ib = (IndexedAngle*)b;
+    return (ia->a < ib->a) ? -1 : ((ia->a > ib->a) ? 1 : 0);
+}
+
+//Get Name===============================================================
 
 static String GetMouvementModeName(MouvementMode i)
 {

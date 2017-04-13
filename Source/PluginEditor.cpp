@@ -363,14 +363,14 @@ void SpatGrisAudioProcessorEditor::updateComMouvement()
 {
     this->comMouvement->clear();
     for(int i = 0; i  < MouvementMode::SIZE_MM; i++){
-        if(((MouvementMode)i == MouvementMode::SymmetricX || (MouvementMode)i == MouvementMode::SymmetricY)){
+        /*if(((MouvementMode)i == MouvementMode::SymmetricX || (MouvementMode)i == MouvementMode::SymmetricY)){
             if (this->filter->getNumSourceUsed() == 2){
                 this->comMouvement->addItem(GetMouvementModeName((MouvementMode)i), i+1);
             }
         }
-        else{
+        else{*/
             this->comMouvement->addItem(GetMouvementModeName((MouvementMode)i), i+1);
-        }
+        //}
     }
     this->comMouvement->setSelectedId(this->filter->getSourceMover()->getMouvementMode()+1);
 }
@@ -463,7 +463,10 @@ void SpatGrisAudioProcessorEditor::buttonClicked (Button *button)
         this->butReadyTrajectory->setToggleState(this->filter->getTrajectory()->getProcessTrajectory(), dontSendNotification);
         this->updateTrajectoryParam();
     }
-    
+    else if(this->butSourcePos == button){
+        this->filter->getSourceMover()->setSourcesPosition((PositionSourceSpeaker)this->comSourcePos->getSelectedItemIndex());
+        
+    }
     else {
         cout << "buttonClicked not found !" << newLine;
     }

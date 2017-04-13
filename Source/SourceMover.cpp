@@ -31,7 +31,10 @@
 SourceMover::SourceMover(SpatGrisAudioProcessor *filt):
 filter(filt)
 {
+    this->listSourceXY.resize(MaxSources);
     this->listSourceRayAng.resize(MaxSources);
+    this->listAngSourceSorted.resize(MaxSources);
+    
     for(int i = 0; i  < MouvementMode::SIZE_MM; i++){
         listMouvement.add(GetMouvementModeName((MouvementMode)i));
     }
@@ -48,11 +51,71 @@ void SourceMover::setMouvementMode(MouvementMode m)
     //*this->mouvementChoiceAuto = (int)m;
 }
 //============================================================================
-void SourceMover::setSourcesPosition()
+void SourceMover::setSourcesPosition(PositionSourceSpeaker pss)
 {
-    for (int i = 0; i < this->filter->getNumSourceUsed(); ++i) {
+    bool alternate = false;
+    bool startAtTop = false;
+    bool clockwise = false;
+    
+    switch (pss){
+        case LeftAlternate:{
+            alternate = true;
+            break;
+        }
+        case LeftClockW:{
+            clockwise = true;
+            break;
+        }
+
+        case LeftCounterClockW:{
+            break;
+        }
+
+        case TopClockW:{
+            startAtTop = true;
+            clockwise = true;
+            break;
+        }
+
+        case TopCounterClockW:{
+            startAtTop = true;
+            break;
+        }
+
+    }
+    float anglePerSp = ThetaMax / this->filter->getNumSourceUsed();
+    if (alternate) {
+        float offset = startAtTop
+        ? (clockwise ? QuarterCircle : (QuarterCircle - anglePerSp))
+        : (QuarterCircle - anglePerSp/2);
+        float start = offset;
+        for (int i = clockwise ? 0 : 1; i < this->filter->getNumSourceUsed(); i += 2) {
+            
+            FPoint xy = GetXYFromRayAng(1.0f, offset);
+            this->filter->setPosXYSource(i, xy.x, xy.y);
+            offset -= anglePerSp;
+        }
         
-        FPoint sourceP = FPoint(*(this->filter->getListSource().at(i)->getX()), *(this->filter->getListSource().at(i)->getY()));
+        offset = start + anglePerSp;
+        for (int i = clockwise ? 1 : 0; i < this->filter->getNumSourceUsed(); i += 2) {
+            FPoint xy = GetXYFromRayAng(1.0f, offset);
+            this->filter->setPosXYSource(i, xy.x, xy.y);
+
+            offset += anglePerSp;
+        }
+    } else {
+        float offset = startAtTop ? QuarterCircle : QuarterCircle + anglePerSp/2;
+        float delta = clockwise ? -anglePerSp : anglePerSp;
+        for (int i = 0; i < this->filter->getNumSourceUsed(); i++) {
+            FPoint xy = GetXYFromRayAng(1.0f, offset);
+            this->filter->setPosXYSource(i, xy.x, xy.y);
+            offset += delta;
+        }
+    }
+    
+    /*for (int i = 0; i < this->filter->getNumSourceUsed(); ++i) {
+        
+        FPoint sourceP = this->filter->getXYSource(i);
         float ray = GetRaySpat(sourceP.x, sourceP.y);
         float ang = GetAngleSpat(sourceP.x, sourceP.y);
             
@@ -62,12 +125,13 @@ void SourceMover::setSourcesPosition()
         FPoint xy = GetXYFromRayAng(ray, ang);
         this->filter->setPosXYSource(i, xy.x, xy.y, false);
 
-    }
+    }*/
 }
 
 void SourceMover::beginMouvement()
 {
     for (int i = 0; i < this->filter->getNumSourceUsed(); i++) {
+        this->listSourceXY.setUnchecked(i, this->filter->getXYSource(i));
         this->listSourceRayAng.setUnchecked(i, this->filter->getRayAngleSource(i));
     }
 }
@@ -77,33 +141,184 @@ void SourceMover::updateSourcesPosition(int iSource, float x, float y)
 {
 
     //deltaMasterPos = NewRayAnl - OldRayAng
-    FPoint deltaMasterPos = FPoint(GetRaySpat(x, y), GetAngleSpat(x, y)) - this->listSourceRayAng[iSource];
+    FPoint currSelectSXY        = FPoint(x,y);
+    FPoint currSelectSRayAng    = FPoint(GetRaySpat(x, y), GetAngleSpat(x, y));
+    FPoint deltaMasterPos;
     
-    if (deltaMasterPos.isOrigin() || isnan(deltaMasterPos.x)|| isnan(deltaMasterPos.y)) {
-        return;     //return if delta is null
-    }
     
+    
+    switch (this->mouvementModeSelect) {
+            
+        case Independent:{
+            deltaMasterPos = currSelectSRayAng - this->listSourceRayAng[iSource];
+            if (deltaMasterPos.isOrigin() || isnan(deltaMasterPos.x)|| isnan(deltaMasterPos.y)) {
+                return;     //return if delta is null
+            }
+            FPoint newCurSrcPosRT = this->listSourceRayAng[iSource] + deltaMasterPos;
+            NormalizeSourceMoverRayAng(newCurSrcPosRT);
+            
+            FPoint xy = GetXYFromRayAng(newCurSrcPosRT.x, newCurSrcPosRT.y);
+            this->filter->setPosXYSource(iSource, xy.x, xy.y, false);
+            break;
+        }
+            
+            
+        case Circular:{
+            deltaMasterPos = currSelectSRayAng - this->listSourceRayAng[iSource];
+            if (deltaMasterPos.isOrigin() || isnan(deltaMasterPos.x)|| isnan(deltaMasterPos.y)) {
+                return;     //return if delta is null
+            }
+            for (int i = 0; i < this->filter->getNumSourceUsed(); ++i) {
+                //newCurSrcPosRT = Old + delta
+                FPoint newCurSrcPosRT = this->listSourceRayAng[i] + deltaMasterPos;
+                NormalizeSourceMoverRayAng(newCurSrcPosRT);
+                
+                FPoint xy = GetXYFromRayAng(newCurSrcPosRT.x, newCurSrcPosRT.y);
+                this->filter->setPosXYSource(i, xy.x, xy.y, false);
+            }
+            break;
+        }
+            
+            
+        case CircularFixRad:{
+            deltaMasterPos = currSelectSRayAng - this->listSourceRayAng[iSource];
+            if (deltaMasterPos.isOrigin() || isnan(deltaMasterPos.x)|| isnan(deltaMasterPos.y)) {
+                return;     //return if delta is null
+            }
+            for (int i = 0; i < this->filter->getNumSourceUsed(); ++i) {
+                //newCurSrcPosRT = Old + delta
+                FPoint newCurSrcPosRT = this->listSourceRayAng[i] + deltaMasterPos;
+                NormalizeSourceMoverRayAng(newCurSrcPosRT);
+                
+                FPoint xy = GetXYFromRayAng(currSelectSRayAng.x, newCurSrcPosRT.y);
+                this->filter->setPosXYSource(i, xy.x, xy.y, false);
+            }
+            break;
+        }
+           
+            
+        case CircularFixAng:{
+            deltaMasterPos = currSelectSRayAng - this->listSourceRayAng[iSource];
+            if (deltaMasterPos.isOrigin() || isnan(deltaMasterPos.x)|| isnan(deltaMasterPos.y)) {
+                return;     //return if delta is null
+            }
+            for (int i = 0; i < this->filter->getNumSourceUsed(); ++i) {
+                //newCurSrcPosRT = Old + delta
+                FPoint newCurSrcPosRT = this->listSourceRayAng[i] + deltaMasterPos;
+                NormalizeSourceMoverRayAng(newCurSrcPosRT);
+                
+                FPoint xy = GetXYFromRayAng(newCurSrcPosRT.x, currSelectSRayAng.y);
+                this->filter->setPosXYSource(i, xy.x, xy.y, false);
+            }
+            break;
+        }
+            
+            
+        case CircularFullyFix:{
+            deltaMasterPos = currSelectSRayAng - this->listSourceRayAng[iSource];
+            if (deltaMasterPos.isOrigin() || isnan(deltaMasterPos.x)|| isnan(deltaMasterPos.y)) {
+                return;     //return if delta is null
+            }
+            for (int i = 0; i < this->filter->getNumSourceUsed(); ++i) {
+                //newCurSrcPosRT = Old + delta
+                FPoint newCurSrcPosRT = this->listSourceRayAng[i] + deltaMasterPos;
+                NormalizeSourceMoverRayAng(newCurSrcPosRT);
+                
+                FPoint xy = GetXYFromRayAng(currSelectSRayAng.x, currSelectSRayAng.y);
+                this->filter->setPosXYSource(i, xy.x, xy.y, false);
+            }
+            break;
+        }
 
-    for (int i = 0; i < this->filter->getNumSourceUsed(); ++i) {
-        
-        //newCurSrcPosRT = Old + delta
-        FPoint newCurSrcPosRT = this->listSourceRayAng[i] + deltaMasterPos;
-        
-        if (newCurSrcPosRT.x < 0.0f){
-            newCurSrcPosRT.x = 0.0f;
+            
+        case DeltaLock:{
+            deltaMasterPos =  currSelectSXY - this->listSourceXY[iSource];
+            if (deltaMasterPos.isOrigin() || isnan(deltaMasterPos.x)|| isnan(deltaMasterPos.y)) {
+                return;     //return if delta is null
+            }
+            for (int i = 0; i < this->filter->getNumSourceUsed(); ++i) {
+                FPoint newCurSrcPosXY = this->listSourceXY[i] + deltaMasterPos;
+                NormalizeSourceMoverXY(newCurSrcPosXY);
+                this->filter->setPosXYSource(i, newCurSrcPosXY.x, newCurSrcPosXY.y, false);
+            }
+            break;
         }
-        if (newCurSrcPosRT.x > RadiusMax){
-            newCurSrcPosRT.x = RadiusMax;
+            
+            
+        case SymmetricX:{
+            deltaMasterPos = currSelectSXY - this->listSourceXY[iSource];
+            if (deltaMasterPos.isOrigin() || isnan(deltaMasterPos.x)|| isnan(deltaMasterPos.y)) {
+                return;     //return if delta is null
+            }
+            for (int i = 0; i < this->filter->getNumSourceUsed(); ++i) {
+      
+                if(this->listSourceXY[i].y<0 && i != iSource){
+                    deltaMasterPos.y = -deltaMasterPos.y;
+                }
+                
+                
+                FPoint newCurSrcPosXY =this->listSourceXY[i] + deltaMasterPos;
+                NormalizeSourceMoverXY(newCurSrcPosXY);
+                this->filter->setPosXYSource(i, newCurSrcPosXY.x, newCurSrcPosXY.y, false);
+            }
+            break;
         }
-        if (newCurSrcPosRT.y < 0.0f){
-            newCurSrcPosRT.y += ThetaMax;
+            
+            
+        case SymmetricY:{
+            deltaMasterPos =  currSelectSXY - this->listSourceXY[iSource];
+            if (deltaMasterPos.isOrigin() || isnan(deltaMasterPos.x)|| isnan(deltaMasterPos.y)) {
+                return;     //return if delta is null
+            }
+            for (int i = 0; i < this->filter->getNumSourceUsed(); ++i) {
+                if(this->listSourceXY[i].x<0 && i != iSource){
+                    deltaMasterPos.x = -deltaMasterPos.x;
+                    
+                }
+                FPoint newCurSrcPosXY =this->listSourceXY[i] + deltaMasterPos;
+                NormalizeSourceMoverXY(newCurSrcPosXY);
+                this->filter->setPosXYSource(i, newCurSrcPosXY.x, newCurSrcPosXY.y, false);
+            }
+            break;
         }
-        if (newCurSrcPosRT.y > ThetaMax){
-            newCurSrcPosRT.y -= ThetaMax;
-        }
-        
-        FPoint xy = GetXYFromRayAng(newCurSrcPosRT.x, newCurSrcPosRT.y);
-        this->filter->setPosXYSource(i, xy.x, xy.y, false);
-        
+        default:
+            jassertfalse;
+            break;
+            
     }
+
 }
+
+//==================================================================================================
+void SourceMover::sortAngles()
+{
+    int iNbrSrc = this->filter->getNumSourceUsed();
+    
+    IndexedAngle * ia = new IndexedAngle[iNbrSrc];
+    
+    for (int j = 0; j < iNbrSrc; j++) {
+        ia[j].i = j;
+        ia[j].a = this->filter->getRayAngleSource(j).y;
+    }
+    
+    qsort(ia, iNbrSrc, sizeof(IndexedAngle), IndexedAngleCompare);
+    
+    int b;
+    for (b = 0; b < iNbrSrc && ia[b].i != this->filter->getSelectItem()->selectID; b++) ;
+    
+    if (b == iNbrSrc) {
+        printf("sort angle error!\n");
+        b = 0;
+    }
+    
+    for (int j = 1; j < iNbrSrc; j++) {
+        int o = (b + j) % iNbrSrc;
+        o = ia[o].i;
+        this->listAngSourceSorted.set(o, (M_PI * 2. * j) / iNbrSrc);
+    }
+    
+    delete[] ia;
+}
+
+
+

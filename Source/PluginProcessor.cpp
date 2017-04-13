@@ -161,6 +161,12 @@ void SpatGrisAudioProcessor::setPosXYSource(int idS, float x, float y, bool upda
         this->sourceMover->updateSourcesPosition(idS, x, y);
     }
 }
+FPoint SpatGrisAudioProcessor::getXYSource(int idS)
+{
+    float x = *(this->listSources.at(idS)->getX());
+    float y = *(this->listSources.at(idS)->getY());
+    return FPoint(x, y);
+}
 FPoint SpatGrisAudioProcessor::getRayAngleSource(int idS)
 {
     float x = *(this->listSources.at(idS)->getX());
