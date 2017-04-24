@@ -7,7 +7,7 @@
  
  PluginEditor.cpp
  
- Developers: Antoine Missout, Vincent Berthiaume
+ Developers: Antoine Missout, Vincent Berthiaumen, Nicolas Masson
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -588,6 +588,7 @@ void SpatGrisAudioProcessorEditor::comboBoxChanged (ComboBox* comboBox)
     else if(this->comSourceSelectPos == comboBox){
         this->filter->getSelectItem()->selecType = SelectedSource;
         this->filter->getSelectItem()->selectID = this->comSourceSelectPos->getSelectedId()-1;
+        this->updateSelectSource();
     }
 }
 
@@ -617,6 +618,13 @@ void SpatGrisAudioProcessorEditor::textEditorReturnKeyPressed (TextEditor &textE
     }
     else if(this->texTrajPendDevia == &textEditor){
         this->filter->getTrajectory()->setPendDeviation(this->texTrajPendDevia->getText().getFloatValue());
+    }
+    else if(this->comSourceSelectRay == &textEditor || this->comSourceSelectAngle == &textEditor){
+        float r = GetValueInRange(this->comSourceSelectRay->getText().getFloatValue(), 0.0f, RadiusMax);
+        float a = GetValueInRange(this->comSourceSelectAngle->getText().getFloatValue(), 0.0f, AngleDegMax);
+        this->filter->setPosRayAngSource(this->filter->getSelectItem()->selectID, r, a, false);
+        this->comSourceSelectRay->setText(String(r,4), dontSendNotification);
+        this->comSourceSelectAngle->setText(String(a ,4), dontSendNotification);
     }
 }
 

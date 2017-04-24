@@ -85,6 +85,7 @@ static const int    MaxBufferSize   = 4096;
 
 
 static const float RadiusMax        = 2.f;
+static const float AngleDegMax      = 360.f;
 static const float HalfCircle       = M_PI;
 static const float QuarterCircle    = M_PI / 2.f;
 static const float ThetaMax         = M_PI * 2.f;
@@ -250,6 +251,13 @@ static int IndexedAngleCompare(const void *a, const void *b)
     IndexedAngle *ia = (IndexedAngle*)a;
     IndexedAngle *ib = (IndexedAngle*)b;
     return (ia->a < ib->a) ? -1 : ((ia->a > ib->a) ? 1 : 0);
+}
+
+static float GetValueInRange(float value, float min, float max)
+{
+    if(value < min){ return min; }
+    if(value > max){ return max; }
+    return value;
 }
 
 //Get Name===============================================================

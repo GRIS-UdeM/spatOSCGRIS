@@ -157,9 +157,11 @@ public:
     
     
     //==============================================================================
-    void setPosXYSource(int idS, float x, float y, bool updateAll = true);
-    FPoint getXYSource(int idS);
-    FPoint getRayAngleSource(int idS);
+    void    setPosXYSource(int idS, float x, float y, bool updateAll = true);
+    void    setPosRayAngSource(int idS, float ray, float ang, bool updateAll = true);
+    
+    FPoint  getXYSource(int idS);
+    FPoint  getRayAngleSource(int idS);
     
     void setSurfaceValue(float surf);
     void setAzimuthValue(float azim);

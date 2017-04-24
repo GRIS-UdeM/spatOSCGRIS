@@ -5,7 +5,7 @@
  
  Copyright (C) 2015  GRIS-UdeM
  
- Developers: Antoine Missout, Vincent Berthiaume
+ Developers: Antoine Missout, Vincent Berthiaume, Nicolas Masson
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -161,6 +161,18 @@ void SpatGrisAudioProcessor::setPosXYSource(int idS, float x, float y, bool upda
         this->sourceMover->updateSourcesPosition(idS, x, y);
     }
 }
+void SpatGrisAudioProcessor::setPosRayAngSource(int idS, float ray, float ang, bool updateAll)
+{
+    FPoint xyS = GetXYFromRayAng(ray, DegreeToRadian(ang));
+
+    *(this->listSources[idS]->getX()) = xyS.x;
+    *(this->listSources[idS]->getY()) = xyS.y;
+    
+    if(updateAll){
+        this->sourceMover->updateSourcesPosition(idS, xyS.x, xyS.y);
+    }
+}
+
 FPoint SpatGrisAudioProcessor::getXYSource(int idS)
 {
     float x = *(this->listSources.at(idS)->getX());
