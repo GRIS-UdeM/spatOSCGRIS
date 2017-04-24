@@ -63,6 +63,7 @@ void SourceMover::setMouvementMode(MouvementMode m)
         }
             
     }
+    this->beginMouvement();
     //*this->mouvementChoiceAuto = (int)m;
 }
 //============================================================================

@@ -33,35 +33,21 @@
 
 using namespace std;
 
-typedef Point<float> FPoint;
-
-
-
-
-/*struct TrajectoryProperties {
-    int                     type;
-    //SpatGrisAudioProcessor* filter;
-    //SourceMover*            mover;
-    float                   duration;
-    bool                    beats;
-    //unique_ptr<AllTrajectoryDirections> direction;
-    bool                    bReturn;
-    float                   repeats;
-    float                   dampening;
-    float                   deviation;
-    float                   turns;
-    float                   width;
-    FPoint                  endPoint;
-    vector<FPoint>          listPoints;
-};*/
 
 class SpatGrisAudioProcessor;
+
 class Trajectory
 {
 public:
-    Trajectory();
+    Trajectory(SpatGrisAudioProcessor * filter);
     ~Trajectory();
     
+    bool process(float seconds, float beats);
+    float getProgressBar();
+    int progressCycle();
+    void stop(bool clearTrajectory = true);
+    
+    //-----------------------------------------------
     //Getter
     bool   getProcessTrajectory(){ return this->processTrajectory; };
     TrajectoryType getTrajectoryType(){ return this->typeSelect; }
@@ -84,11 +70,11 @@ public:
     vector<FPoint>  getListPointsFreeDraw(){ return this->listPointsFreeDraw; }
     
     //Setter
-    void setProcessTrajectory(bool b){ this->processTrajectory = b; };
+    void setProcessTrajectory(bool b){ this->processTrajectory = b; if(this->processTrajectory){ this->start();}};
     void setTrajectoryType(TrajectoryType i){ this->typeSelect = i; }
     void setTimeDuration(float t){ this->timeDuration = t; }
     void setInSeconds(bool b){ this->inSeconds = b; }
-    void setCycle(float c){ this->cycle = c; }
+    void setCycle(float c){ this->cycle = c; (this->cycle==0.0f) ? this->infCycleLoop = true : this->infCycleLoop = false;}
     void setSpeed(float s){ this->speed = s; }
     
     void setEllipseWidth(float w){ this->ellipseWidth = w; }
@@ -102,17 +88,34 @@ public:
     void setRandSpeed(float s){ this->randSpeed = s; }
     void setRandSeparate(bool s){ this->randSeparate = s; }
     void setListPointsFreeDraw(vector<FPoint> vfp){ this->listPointsFreeDraw = vfp; }
-
+   
+    
+   
 private:
-    bool    processTrajectory = false;
+    
+    void circleProcess();
+    void ellipseProcess();
+    void spiralProcess();
+    
+
+    void start();
+    
+    //--------------------------------------------------
+    SpatGrisAudioProcessor * filter;
+    vector<FPoint>   listSourceRayAng;
+    bool    processTrajectory   = false;
+    bool    processTrafEnd      = false;
+    float   timeDone            = 0.0f;
+    float   timeTotalDuration   = 0.0f;
     
     TrajectoryType  typeSelect;
     float           timeDuration = 1.f;
     bool            inSeconds = true;      //Second(true) or beat(false)
     float           cycle = 1.f;
+    bool            infCycleLoop = false;
     float           speed = 1.f;
     
-    float           ellipseWidth = 0.f;
+    float           ellipseWidth = 0.5f;
     bool            inOneWay = true;       //OneWay(true) or Return(false)
     float           radiusEnd = 0.f;
     float           angleEnd = 0.f;
@@ -124,6 +127,8 @@ private:
     bool            randSeparate = false;
     vector<FPoint>  listPointsFreeDraw;
 };
+
+
 
 /*
 class Trajectory : public ReferenceCountedObject

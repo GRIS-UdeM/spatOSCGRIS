@@ -122,6 +122,10 @@ static const float  MinTrajRandomSpeed   = 0.f;
 static const float  MaxTrajRandomSpeed   = 1.f;
 static const float  DefTrajRandomSpeed   = 0.5f;
 
+static const float  MinTrajWidthEllipse   = 0.1f;
+static const float  MaxTrajWidthEllipse   = 5.f;
+static const float  DefTrajWidthEllipse   = 0.5f;
+
 //--------------------------------------------------
 //UI Param
 //--------------------------------------------------

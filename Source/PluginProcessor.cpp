@@ -30,7 +30,7 @@
 SpatGrisAudioProcessor::SpatGrisAudioProcessor()
 {
     this->sourceMover = new SourceMover(this);
-    this->trajectory = new Trajectory();
+    this->trajectory = new Trajectory(this);
     
     this->selectItem = new SelectItem();
     this->selectItem->selectID = 1;
@@ -71,8 +71,8 @@ const String SpatGrisAudioProcessor::getName() const {
 //==============================================================================
 void SpatGrisAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-
-
+    this->sampleRate = sampleRate;
+    this->bufferSize = samplesPerBlock;
 }
 
 void SpatGrisAudioProcessor::releaseResources()
@@ -85,7 +85,12 @@ void SpatGrisAudioProcessor::releaseResources()
 //==============================================================================
 void SpatGrisAudioProcessor::processBlock(AudioBuffer<float> &pBuffer, MidiBuffer& midiMessages)
 {
-
+    if (this->bufferSize != pBuffer.getNumSamples()){
+        this->bufferSize = pBuffer.getNumSamples();
+    }
+    
+    //==================================== PROCESS TRAJECTORIES ===========================================
+    processTrajectory();
 }
 void SpatGrisAudioProcessor::processBlockBypassed (AudioBuffer<float> &buffer, MidiBuffer& midiMessages)
 {
@@ -173,6 +178,18 @@ void SpatGrisAudioProcessor::setPosRayAngSource(int idS, float ray, float ang, b
     }
 }
 
+void SpatGrisAudioProcessor::setPosRayAngRadSource(int idS, float ray, float ang, bool updateAll)
+{
+    FPoint xyS = GetXYFromRayAng(ray, ang);
+    
+    *(this->listSources[idS]->getX()) = xyS.x;
+    *(this->listSources[idS]->getY()) = xyS.y;
+    
+    if(updateAll){
+        this->sourceMover->updateSourcesPosition(idS, xyS.x, xyS.y);
+    }
+}
+
 FPoint SpatGrisAudioProcessor::getXYSource(int idS)
 {
     float x = *(this->listSources.at(idS)->getX());
@@ -218,7 +235,21 @@ void SpatGrisAudioProcessor::setElevationValue(float elev)
         *(this->listSources.at(this->selectItem->selectID)->getElev()) = elev;
     }
 }
-
+//==============================================================================
+void SpatGrisAudioProcessor::processTrajectory()
+{
+    AudioPlayHead::CurrentPositionInfo cpi;
+    getPlayHead()->getCurrentPosition(cpi);
+    
+    if(this->trajectory->getProcessTrajectory() && cpi.isPlaying){
+        double bps = cpi.bpm / 60;
+        float seconds = this->bufferSize / this->sampleRate;
+        float beats = seconds * bps;
+        
+        bool done = this->trajectory->process(seconds, beats);
+    }
+    
+}
 
 //==============================================================================
 void SpatGrisAudioProcessor::getStateInformation (MemoryBlock& destData)

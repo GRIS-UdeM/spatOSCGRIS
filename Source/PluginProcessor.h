@@ -159,6 +159,7 @@ public:
     //==============================================================================
     void    setPosXYSource(int idS, float x, float y, bool updateAll = true);
     void    setPosRayAngSource(int idS, float ray, float ang, bool updateAll = true);
+    void    setPosRayAngRadSource(int idS, float ray, float ang, bool updateAll = true);
     
     FPoint  getXYSource(int idS);
     FPoint  getRayAngleSource(int idS);
@@ -176,7 +177,13 @@ public:
     //==============================================================================
 
 private:
-
+    void processTrajectory();
+    
+    //Audio Param =================================
+    double  sampleRate;
+    int     bufferSize;
+    
+    //=============================================
     vector<Source *>   listSources;
     vector<Speaker *>  listSpeakers;
     unsigned int numSourceUsed;

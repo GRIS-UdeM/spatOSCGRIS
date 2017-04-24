@@ -465,7 +465,7 @@ void SpatGrisAudioProcessorEditor::buttonClicked (Button *button)
     }
     else if(this->butSourcePos == button){
         this->filter->getSourceMover()->setSourcesPosition((PositionSourceSpeaker)this->comSourcePos->getSelectedItemIndex());
-        
+        this->updateSelectSource();
     }
     else {
         cout << "buttonClicked not found !" << newLine;
@@ -605,7 +605,9 @@ void SpatGrisAudioProcessorEditor::textEditorReturnKeyPressed (TextEditor &textE
         this->filter->getTrajectory()->setCycle(this->texCycleTrajectory->getText().getFloatValue());
         
     }else if(this->texTrajEllipseWidth == &textEditor){
-        this->filter->getTrajectory()->setEllipseWidth(this->texTrajEllipseWidth->getText().getFloatValue());
+        float w = GetValueInRange(this->texTrajEllipseWidth->getText().getFloatValue(), MinTrajWidthEllipse, MaxTrajWidthEllipse);
+        this->filter->getTrajectory()->setEllipseWidth(w);
+        this->texTrajEllipseWidth->setText(String(w,2), dontSendNotification);
         
     }else if(this->texTrajRadiusEnd == &textEditor){
         this->filter->getTrajectory()->setRadiusEnd(this->texTrajRadiusEnd->getText().getFloatValue());
@@ -631,6 +633,10 @@ void SpatGrisAudioProcessorEditor::textEditorReturnKeyPressed (TextEditor &textE
 void SpatGrisAudioProcessorEditor::timerCallback()
 {
 	this->spatFieldComp->repaint();
+    
+    if(this->filter->getTrajectory()->getProcessTrajectory()){
+        this->progressBarTraject->setValue(this->filter->getTrajectory()->getProgressBar());
+    }
 }
 
 void SpatGrisAudioProcessorEditor::paint (Graphics& g)
