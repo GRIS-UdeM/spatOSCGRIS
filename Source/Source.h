@@ -20,8 +20,8 @@ public:
     ~Source();
     
     unsigned int getId(){ return this->id; }
-    unsigned int getIdOSC(){ return this->idOSC; }
-    void setIdOSC(unsigned int idO){ this->idOSC = idO; }
+    //unsigned int getIdOSC(){ return this->idOSC; }
+    //void setIdOSC(unsigned int idO){ this->idOSC = idO; }
     
     AudioParameterFloat * getX(){ return this->audPX; }
     AudioParameterFloat * getY(){ return this->audPY; }
@@ -33,7 +33,7 @@ public:
 private:
     SpatGrisAudioProcessor * filter;
     unsigned int id;
-    unsigned int idOSC;
+    //unsigned int idOSC;
     
     AudioParameterFloat     * audPX;
     AudioParameterFloat     * audPY;

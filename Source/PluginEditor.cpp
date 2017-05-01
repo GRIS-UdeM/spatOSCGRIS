@@ -650,6 +650,22 @@ void SpatGrisAudioProcessorEditor::textEditorReturnKeyPressed (TextEditor &textE
         this->comSourceSelectRay->setText(String(r,4), dontSendNotification);
         this->comSourceSelectAngle->setText(String(a ,4), dontSendNotification);
     }
+    
+    else if(this->texOSCSourceIDF == &textEditor){
+        this->filter->setOscFirstIdSource(this->texOSCSourceIDF->getText().getIntValue());
+    }
+    
+    else if(this->texOSCPort == &textEditor){
+        int v = GetValueInRange(this->texOSCPort->getText().getIntValue(), OscMinPort, OscMaxPort);
+        this->filter->setOscPort(v);
+        if(this->filter->getOscRun()){
+            this->labOSCPort->setColour(Label::textColourId, this->grisFeel.getFontColour());
+        }else{
+            this->labOSCPort->setColour(Label::textColourId, Colours::red);
+        }
+        this->texOSCPort->setText(String(v), dontSendNotification);
+    }
+    
 }
 
 void SpatGrisAudioProcessorEditor::timerCallback()

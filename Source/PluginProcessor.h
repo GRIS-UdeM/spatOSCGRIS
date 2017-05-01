@@ -94,7 +94,8 @@ typedef Point<float> FPoint;
 
 
 //==============================================================================
-class SpatGrisAudioProcessor : public AudioProcessor
+class SpatGrisAudioProcessor :  public AudioProcessor,
+                                private Timer
 {
 public:
     //==============================================================================
@@ -122,7 +123,7 @@ public:
     const String getProgramName (int index);
     void changeProgramName (int index, const String& newName);
     //==============================================================================
-    
+    void timerCallback() override;
     
     //==============================================================================
     SourceMover * getSourceMover()  { return this->sourceMover; }
@@ -154,11 +155,13 @@ public:
     bool            getOscOn()              { return this->oscOn; }
     unsigned int    getOscFirstIdSource()   { return this->oscFirstIdSource; }
     unsigned int    getOscPort()            { return this->oscPort; }
-    
+    bool            getOscRun()             { return this->oscRun; }
     
     void setOscOn(bool v)                   { this->oscOn = v; }
     void setOscFirstIdSource(unsigned int v){ this->oscFirstIdSource = v; }
-    void setOscPort(unsigned int v)         { this->oscPort = v; }
+    void setOscPort(unsigned int v)         {   this->oscPort = v;
+                                                this->oscRun = this->oscSender.connect(this->oscIpAddress, this->oscPort);
+                                            }
     //==============================================================================
     
     
@@ -214,8 +217,9 @@ private:
     //OSC param========================
     OSCSender       oscSender;
     bool            oscOn               = true;
+    bool            oscRun              = false;
     unsigned int    oscFirstIdSource    = 1;
-    unsigned int    oscPort             = 18032;
+    unsigned int    oscPort             = OscDefPort;
     String          oscIpAddress        = "127.0.0.1";
     //========================================
     

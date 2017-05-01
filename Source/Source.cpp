@@ -11,7 +11,7 @@
 #include "DefaultParam.h"
 
 Source::Source(SpatGrisAudioProcessor * filt, unsigned int idS):
-filter(filt),id(idS),idOSC(idS)
+filter(filt),id(idS)
 {
     NormalisableRange<float> nrf = NormalisableRange<float> (-2.0f, 2.0f);
     nrf.interval = 0.00001f;

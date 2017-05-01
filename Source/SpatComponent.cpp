@@ -156,7 +156,7 @@ void SpatComponent::paint(Graphics &g)
         g.fillEllipse(sourceP.x , sourceP.y , SourceDiameter, SourceDiameter);
         
         stringVal.clear();
-        stringVal << (int)this->filter->getListSource().at(i)->getIdOSC();
+        stringVal << (int)(this->filter->getListSource().at(i)->getId() + (this->filter->getOscFirstIdSource()-1));
         
         g.setColour(Colours::black);
         g.setFont(this->grisFeel->getFont());

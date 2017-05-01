@@ -55,7 +55,9 @@ SpatGrisAudioProcessor::SpatGrisAudioProcessor()
     
     this->sourceMover->setSourcesPosition();
     
-    this->oscSender.connect(this->oscIpAddress, this->oscPort);
+    
+    this->oscRun = this->oscSender.connect(this->oscIpAddress, this->oscPort);
+    this->startTimerHz(OscTimerHz);
 }
 
 SpatGrisAudioProcessor::~SpatGrisAudioProcessor()
@@ -79,7 +81,7 @@ void SpatGrisAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 
 void SpatGrisAudioProcessor::releaseResources()
 {
-   
+
 }
 //==============================================================================
 
@@ -94,11 +96,10 @@ void SpatGrisAudioProcessor::processBlock(AudioBuffer<float> &pBuffer, MidiBuffe
     //==================================== PROCESS TRAJECTORIES ===========================================
     this->processTrajectory();
     
-    this->sendOscMessageValues();
 }
 void SpatGrisAudioProcessor::processBlockBypassed (AudioBuffer<float> &buffer, MidiBuffer& midiMessages)
 {
-    
+
 }
 //==============================================================================
 
@@ -270,20 +271,23 @@ void SpatGrisAudioProcessor::processTrajectory()
 
 void SpatGrisAudioProcessor::sendOscMessageValues()
 {
-    if(this->oscOn){
+    if(this->oscOn ){
         switch (this->typeProcess) {
                 
             case OSCSpatServer:{
                 for(int iCurSrc = 0; iCurSrc < this->numSourceUsed; ++iCurSrc){
-                    int   channel_osc   = this->oscFirstIdSource+iCurSrc-1;             //in gui the range is 1-99, for zirkonium it actually starts at 0 (or potentially lower, but Zirkosc uses 0 as starting channel)
+                    int   channel_osc   = this->oscFirstIdSource+iCurSrc-1;
                     FPoint rayAng       = getRayAngleSource(iCurSrc);
-                    float azim_osc      = ThetaMax - (rayAng.y - QuarterCircle);//For Zirkonium, -1 is in the back right and +1 in the back left. 0 is forward
-                    float elev_osc      = (rayAng.x / RadiusMax) * QuarterCircle;//For Zirkonium, 0 is the edge of the dome, .5 is the top
-                    float azimspan_osc  = *this->getListSource().at(iCurSrc)->getAzim();     //min azim span is 0, max is 2. I figure this is radians.
-                    float elevspan_osc  = *this->getListSource().at(iCurSrc)->getElev();     //min elev span is 0, max is .5
+                    float azim_osc      = ThetaMax - (rayAng.y - QuarterCircle);
+                    float elev_osc      = (rayAng.x / RadiusMax) * QuarterCircle;
+                    float azimspan_osc  = *this->getListSource().at(iCurSrc)->getAzim();
+                    float elevspan_osc  = *this->getListSource().at(iCurSrc)->getElev();
                     float height_osc    = *this->getListSource().at(iCurSrc)->getHeigt();
-                    float gain_osc      = 1;                                //gain is just locked to max value
+                    float gain_osc      = 1;
                     
+                    if(isnan(azim_osc) || isnan(elev_osc) ){
+                        cout << azim_osc << newLine;
+                    }
                     OSCAddressPattern oscPattern("/spat/serv");
                     OSCMessage message(oscPattern);
                     
@@ -331,6 +335,11 @@ void SpatGrisAudioProcessor::sendOscMessageValues()
                 
         }
     }
+}
+
+void SpatGrisAudioProcessor::timerCallback()
+{
+    this->sendOscMessageValues();
 }
 
 //==============================================================================

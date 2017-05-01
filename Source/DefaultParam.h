@@ -83,6 +83,10 @@ static const int    MaxSources      = 8;
 static const int    MaxSpeakers     = 16;
 static const int    MaxBufferSize   = 4096;
 
+static const int    OscTimerHz      = 30;
+static const int    OscMinPort      = 0;
+static const int    OscMaxPort      = 65535;
+static const int    OscDefPort      = 18032;
 
 static const float RadiusMax        = 2.f;
 static const float AngleDegMax      = 360.f;
@@ -159,11 +163,16 @@ static float GetRaySpat(float x, float y){
 }
 static float GetAngleSpat(float x, float y)
 {
-    if(x < 0){
-        return atanf(y/x)+M_PI;
+    float r;
+    if(x < 0.0f){
+        r = atanf(y/x)+M_PI;
     }else{
-        return atanf(y/x);
+        r = atanf(y/x);
     }
+    if(isnan(r)){
+        return 0.0f;
+    }
+    return r;
 }
 static FPoint GetXYFromRayAng(float r, float a){
     return FPoint((r * cosf(a)),(r * sinf(a)));
