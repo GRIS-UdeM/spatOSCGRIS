@@ -110,9 +110,9 @@ static const float  MinElevSource   = 0.f;
 static const float  MaxElevSource   = 0.5f;
 static const float  DefElevSource   = 0.f;
 //Height
-static const float  MinHeigSource   = -1.f;
-static const float  MaxHeigSource   = 0.f;
-static const float  DefHeigSource   = 0.f;
+static const float  MinHeigSource   = 0.f;
+static const float  MaxHeigSource   = 1.f;
+static const float  DefHeigSource   = 1.f;
 
 //--------------------------------------------------
 //Trajectory Param

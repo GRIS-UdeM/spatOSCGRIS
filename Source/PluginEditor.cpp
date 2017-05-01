@@ -477,6 +477,9 @@ void SpatGrisAudioProcessorEditor::buttonClicked (Button *button)
         this->filter->getSourceMover()->setSourcesPosition((PositionSourceSpeaker)this->comSourcePos->getSelectedItemIndex());
         this->updateSelectSource();
     }
+    else if(this->togOSCActive == button){
+       this->filter->setOscOn(this->togOSCActive->getToggleState());
+    }
     else {
         cout << "buttonClicked not found !" << newLine;
     }
@@ -604,6 +607,10 @@ void SpatGrisAudioProcessorEditor::comboBoxChanged (ComboBox* comboBox)
         this->filter->getSelectItem()->selecType = SelectedSource;
         this->filter->getSelectItem()->selectID = this->comSourceSelectPos->getSelectedId()-1;
         this->updateSelectSource();
+    }
+    
+    else if(this->comTypeProcess == comboBox){
+        this->filter->setTypeProcess((ProcessType)this->comTypeProcess->getSelectedItemIndex());
     }
 }
 

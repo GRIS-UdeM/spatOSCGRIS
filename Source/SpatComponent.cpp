@@ -269,10 +269,9 @@ void SpatComponent::mouseWheelMove(const MouseEvent &event, const MouseWheelDeta
         float dy = mouseP.y - sourceP.y;
         float distanceSquared = dx*dx + dy*dy;
         if(distanceSquared < SourceRadius*SourceRadius){
-            float v = *this->filter->getListSource().at(i)->getHeigt();
-            float newV = v + wheel.deltaY ;
-            newV = GetValueInRange(newV, MinHeigSource, MaxHeigSource);
-            *this->filter->getListSource().at(i)->getHeigt() = newV;
+            float newV = float(*this->filter->getListSource().at(i)->getHeigt()) + wheel.deltaY ;
+            this->filter->setHeightSValue(GetValueInRange(newV, MinHeigSource, MaxHeigSource));
+
             this->editor->updateSourceParam();
         }
     }

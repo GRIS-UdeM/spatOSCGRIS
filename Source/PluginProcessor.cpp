@@ -54,6 +54,8 @@ SpatGrisAudioProcessor::SpatGrisAudioProcessor()
     this->numSpeakerUsed = MaxSpeakers;
     
     this->sourceMover->setSourcesPosition();
+    
+    this->oscSender.connect(this->oscIpAddress, this->oscPort);
 }
 
 SpatGrisAudioProcessor::~SpatGrisAudioProcessor()
@@ -90,7 +92,9 @@ void SpatGrisAudioProcessor::processBlock(AudioBuffer<float> &pBuffer, MidiBuffe
     }
     
     //==================================== PROCESS TRAJECTORIES ===========================================
-    processTrajectory();
+    this->processTrajectory();
+    
+    this->sendOscMessageValues();
 }
 void SpatGrisAudioProcessor::processBlockBypassed (AudioBuffer<float> &buffer, MidiBuffer& midiMessages)
 {
@@ -261,6 +265,72 @@ void SpatGrisAudioProcessor::processTrajectory()
         bool done = this->trajectory->process(seconds, beats);
     }
     
+}
+
+
+void SpatGrisAudioProcessor::sendOscMessageValues()
+{
+    if(this->oscOn){
+        switch (this->typeProcess) {
+                
+            case OSCSpatServer:{
+                for(int iCurSrc = 0; iCurSrc < this->numSourceUsed; ++iCurSrc){
+                    int   channel_osc   = this->oscFirstIdSource+iCurSrc-1;             //in gui the range is 1-99, for zirkonium it actually starts at 0 (or potentially lower, but Zirkosc uses 0 as starting channel)
+                    FPoint rayAng       = getRayAngleSource(iCurSrc);
+                    float azim_osc      = ThetaMax - (rayAng.y - QuarterCircle);//For Zirkonium, -1 is in the back right and +1 in the back left. 0 is forward
+                    float elev_osc      = (rayAng.x / RadiusMax) * QuarterCircle;//For Zirkonium, 0 is the edge of the dome, .5 is the top
+                    float azimspan_osc  = *this->getListSource().at(iCurSrc)->getAzim();     //min azim span is 0, max is 2. I figure this is radians.
+                    float elevspan_osc  = *this->getListSource().at(iCurSrc)->getElev();     //min elev span is 0, max is .5
+                    float height_osc    = *this->getListSource().at(iCurSrc)->getHeigt();
+                    float gain_osc      = 1;                                //gain is just locked to max value
+                    
+                    OSCAddressPattern oscPattern("/spat/serv");
+                    OSCMessage message(oscPattern);
+                    
+                    message.addInt32(channel_osc);
+                    message.addFloat32(azim_osc);
+                    message.addFloat32(elev_osc);
+                    message.addFloat32(azimspan_osc);
+                    message.addFloat32(elevspan_osc);
+                    message.addFloat32(height_osc);
+                    message.addFloat32(gain_osc);
+                    if (!this->oscSender.send(message)) {
+                        DBG("Error: could not send OSC message.");
+                        return;
+                    }
+                }
+                break;
+            }
+                
+            case OSCZirkonium:{
+                for(int iCurSrc = 0; iCurSrc < this->numSourceUsed; ++iCurSrc){
+                    int   channel_osc   = this->oscFirstIdSource+iCurSrc-1;             //in gui the range is 1-99, for zirkonium it actually starts at 0 (or potentially lower, but Zirkosc uses 0 as starting channel)
+                    FPoint rayAng       = getRayAngleSource(iCurSrc);
+                    float azim_osc      = rayAng.x;//For Zirkonium, -1 is in the back right and +1 in the back left. 0 is forward
+                    float elev_osc      = rayAng.y;//For Zirkonium, 0 is the edge of the dome, .5 is the top
+                    float azimspan_osc  = *this->getListSource().at(iCurSrc)->getAzim();     //min azim span is 0, max is 2. I figure this is radians.
+                    float elevspan_osc  = *this->getListSource().at(iCurSrc)->getElev();     //min elev span is 0, max is .5
+                    float gain_osc      = 1;                                //gain is just locked to max value
+                    
+                    OSCAddressPattern oscPattern("/pan/az");
+                    OSCMessage message(oscPattern);
+                    
+                    message.addInt32(channel_osc);
+                    message.addFloat32(azim_osc);
+                    message.addFloat32(elev_osc);
+                    message.addFloat32(azimspan_osc);
+                    message.addFloat32(elevspan_osc);
+                    message.addFloat32(gain_osc);
+                    if (!this->oscSender.send(message)) {
+                        DBG("Error: could not send OSC message.");
+                        return;
+                    }
+                }
+                break;
+            }
+                
+        }
+    }
 }
 
 //==============================================================================

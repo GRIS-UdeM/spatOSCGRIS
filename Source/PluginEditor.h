@@ -89,6 +89,7 @@ private :
     
     GrisLookAndFeel grisFeel;
     TooltipWindow tooltipWindow;
+    
     //Window Resizer---------------------------------
     ComponentBoundsConstrainer resizeWindow;
     ScopedPointer<ResizableCornerComponent> resizer;

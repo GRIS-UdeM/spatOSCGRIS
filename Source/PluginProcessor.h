@@ -137,6 +137,8 @@ public:
     SelectItem * getSelectItem() { return this->selectItem; }
     
     //----
+    ProcessType getTypeProcess() { return this->typeProcess; }
+    
     bool getLinkSurface()   { return this->linkSurface; }
     bool getLinkAzimuth()   { return this->linkAzimuth; }
     bool getLinkElevation() { return this->linkElevation; }
@@ -147,10 +149,12 @@ public:
     void setLinkElevation(bool v)   { this->linkElevation = v; }
     bool setLinkHeight(bool v)      { this->linkHeight= v; }
     
+    void setTypeProcess(ProcessType v)      { this->typeProcess = v; }
     //----
     bool            getOscOn()              { return this->oscOn; }
     unsigned int    getOscFirstIdSource()   { return this->oscFirstIdSource; }
     unsigned int    getOscPort()            { return this->oscPort; }
+    
     
     void setOscOn(bool v)                   { this->oscOn = v; }
     void setOscFirstIdSource(unsigned int v){ this->oscFirstIdSource = v; }
@@ -181,6 +185,7 @@ public:
 
 private:
     void processTrajectory();
+    void sendOscMessageValues();
     
     //Audio Param =================================
     double  sampleRate;
@@ -191,6 +196,8 @@ private:
     vector<Speaker *>  listSpeakers;
     unsigned int numSourceUsed;
     unsigned int numSpeakerUsed;
+    
+    ProcessType typeProcess;
     
     SelectItem * selectItem;
     
@@ -205,9 +212,11 @@ private:
     //========================================
     
     //OSC param========================
+    OSCSender       oscSender;
     bool            oscOn               = true;
     unsigned int    oscFirstIdSource    = 1;
     unsigned int    oscPort             = 18032;
+    String          oscIpAddress        = "127.0.0.1";
     //========================================
     
     
