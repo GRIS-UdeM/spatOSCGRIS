@@ -25,6 +25,7 @@ public:
     
     AudioParameterFloat * getX(){ return this->audPX; }
     AudioParameterFloat * getY(){ return this->audPY; }
+    AudioParameterFloat * getHeigt(){ return this->audPHeight; }
     AudioParameterFloat * getSurf(){ return this->audPSurf; }
     AudioParameterFloat * getAzim(){ return this->audPAzim; }
     AudioParameterFloat * getElev(){ return this->audPElev; }
@@ -36,6 +37,7 @@ private:
     
     AudioParameterFloat     * audPX;
     AudioParameterFloat     * audPY;
+    AudioParameterFloat     * audPHeight;
     AudioParameterFloat     * audPSurf;
     AudioParameterFloat     * audPAzim;
     AudioParameterFloat     * audPElev;

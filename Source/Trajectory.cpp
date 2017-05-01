@@ -139,8 +139,8 @@ void Trajectory::circleProcess()
 
 }
 
-void Trajectory::ellipseProcess() {
-    //calculate delta theta
+void Trajectory::ellipseProcess()
+{
     float deltaTheta = (float)(this->timeDone / this->timeDuration);
     deltaTheta = deltaTheta * 2 * M_PI ;
     
@@ -156,8 +156,8 @@ void Trajectory::ellipseProcess() {
 
 }
 
-void Trajectory::spiralProcess() {
-    //calculate delta theta
+void Trajectory::spiralProcess()
+{
     float deltaTheta = (float)(this->timeDone / this->timeDuration);
     float deltaThetaFactor = deltaTheta;
     

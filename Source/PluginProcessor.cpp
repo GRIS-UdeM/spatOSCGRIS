@@ -235,6 +235,18 @@ void SpatGrisAudioProcessor::setElevationValue(float elev)
         *(this->listSources.at(this->selectItem->selectID)->getElev()) = elev;
     }
 }
+
+void SpatGrisAudioProcessor::setHeightSValue(float hei)
+{
+    if(this->linkHeight){
+        for(int iSour = 0; iSour < this->numSourceUsed; iSour++){
+            *(this->listSources.at(iSour)->getHeigt()) = hei;
+        }
+    }else{
+        *(this->listSources.at(this->selectItem->selectID)->getHeigt()) = hei;
+    }
+}
+
 //==============================================================================
 void SpatGrisAudioProcessor::processTrajectory()
 {

@@ -49,14 +49,14 @@ public:
     ~SpatComponent();
     
     //======================================================
-    void paint(Graphics &g) ;
+    void paint(Graphics &g) override;
     void resized(int fieldSize);
     
     //======================================================
-    void mouseDown (const MouseEvent &event);
-    void mouseDrag (const MouseEvent &event);
-    void mouseUp (const MouseEvent &event);
-    
+    void mouseDown (const MouseEvent &event) override;
+    void mouseDrag (const MouseEvent &event) override;
+    void mouseUp (const MouseEvent &event) override;
+    void mouseWheelMove(const MouseEvent &event, const MouseWheelDetails &wheel) override;
     //======================================================
     
 private:

@@ -111,7 +111,12 @@ private :
     
     Label           * labElevSpan;
     ToggleButton    * togLinkElevSpan;
-    Slider          * sliAElevSpann;
+    Slider          * sliElevSpan;
+    
+    
+    Label           * labHeightSour;
+    ToggleButton    * togLinkHeightSour;
+    Slider          * sliHeightSour;
     
     //For Outputs param
     vector<LevelComponent *> vecLevelOut;

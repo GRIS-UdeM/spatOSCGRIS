@@ -252,6 +252,32 @@ void SpatComponent::mouseUp(const MouseEvent &event)
 
 }
 
+void SpatComponent::mouseWheelMove(const MouseEvent &event, const MouseWheelDetails &wheel)
+{
+    const int fieldWH = getWidth();
+    FPoint mouseP(event.x, event.y);
+    
+    const float w = (fieldWH - SourceDiameter) /2.0f;
+    this->filter->getSelectItem()->selecType = NoSelection;
+    
+    for(int i = 0; i < this->filter->getNumSourceUsed(); ++i){
+        
+        FPoint sourceP = FPoint(*(this->filter->getListSource().at(i)->getX()), *(this->filter->getListSource().at(i)->getY()));
+        NormalizeXYSourceWithScreen(sourceP, w);
+        
+        float dx = mouseP.x - sourceP.x;
+        float dy = mouseP.y - sourceP.y;
+        float distanceSquared = dx*dx + dy*dy;
+        if(distanceSquared < SourceRadius*SourceRadius){
+            float v = *this->filter->getListSource().at(i)->getHeigt();
+            float newV = v + wheel.deltaY ;
+            newV = GetValueInRange(newV, MinHeigSource, MaxHeigSource);
+            *this->filter->getListSource().at(i)->getHeigt() = newV;
+            this->editor->updateSourceParam();
+        }
+    }
+}
+
 //=============================================================
 
 void SpatComponent::drawAzimElevSource(Graphics &g, int i, const int fieldWH, const int fieldCenter){

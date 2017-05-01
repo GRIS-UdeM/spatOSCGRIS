@@ -140,10 +140,12 @@ public:
     bool getLinkSurface()   { return this->linkSurface; }
     bool getLinkAzimuth()   { return this->linkAzimuth; }
     bool getLinkElevation() { return this->linkElevation; }
+    bool getLinkHeight()    { return this->linkHeight; }
     
     void setLinkSurface(bool v)     { this->linkSurface = v; }
     void setLinkAzimuth(bool v)     { this->linkAzimuth = v; }
     void setLinkElevation(bool v)   { this->linkElevation = v; }
+    bool setLinkHeight(bool v)      { this->linkHeight= v; }
     
     //----
     bool            getOscOn()              { return this->oscOn; }
@@ -167,6 +169,7 @@ public:
     void setSurfaceValue(float surf);
     void setAzimuthValue(float azim);
     void setElevationValue(float elev);
+    void setHeightSValue(float elev);
     
     //==============================================================================
     
@@ -194,6 +197,7 @@ private:
     bool linkSurface    = false;
     bool linkAzimuth    = false;
     bool linkElevation  = false;
+    bool linkHeight     = false;
     
     //Trajectory param========================
     SourceMover     * sourceMover;

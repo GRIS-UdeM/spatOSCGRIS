@@ -62,13 +62,17 @@ SpatGrisAudioProcessorEditor::SpatGrisAudioProcessorEditor(SpatGrisAudioProcesso
     
     
     //Add All Component-------------------------------------------------------------------------------------
-    this->labAzimSpan           = addLabel("Azimuth Span", "Azimuth Span Master Soutce", 0, 10, DefaultLabWidth, DefaultLabHeight, this->boxSourceParam->getContent());
-    this->togLinkAzimSpan       = addToggleButton("Link", "Link other sources", 90, 8, DefaultLabWidth, DefaultLabHeight,  this->boxSourceParam->getContent());
-    this->sliAzimSpan           = addSlider("", "", 4, 30, 180, DefaultLabHeight, this->boxSourceParam->getContent(), MinAzimSource, MaxAzimSource, ShowSliderInter);
+    this->labAzimSpan           = addLabel("Azimuth Span", "Azimuth Span Selected Source", 0, 4, DefaultLabWidth, DefaultLabHeight, this->boxSourceParam->getContent());
+    this->togLinkAzimSpan       = addToggleButton("Link", "Link other sources", 90, 2, DefaultLabWidth, DefaultLabHeight,  this->boxSourceParam->getContent());
+    this->sliAzimSpan           = addSlider("", "", 4, 24, 180, DefaultLabHeight, this->boxSourceParam->getContent(), MinAzimSource, MaxAzimSource, ShowSliderInter);
     
-    this->labElevSpan           = addLabel("Elevation Span", "Elevation Span Master Soutce", 0, 70, DefaultLabWidth, DefaultLabHeight, this->boxSourceParam->getContent());
-    this->togLinkElevSpan       = addToggleButton("Link", "Link other sources", 90, 68, DefaultLabWidth, DefaultLabHeight,  this->boxSourceParam->getContent());
-    this->sliAElevSpann         = addSlider("", "", 4, 90, 180, DefaultLabHeight, this->boxSourceParam->getContent(), MinElevSource, MaxElevSource, ShowSliderInter);
+    this->labElevSpan           = addLabel("Elevation Span", "Elevation Span Selected Source", 0, 50, DefaultLabWidth, DefaultLabHeight, this->boxSourceParam->getContent());
+    this->togLinkElevSpan       = addToggleButton("Link", "Link other sources", 90, 48, DefaultLabWidth, DefaultLabHeight,  this->boxSourceParam->getContent());
+    this->sliElevSpan           = addSlider("", "", 4, 70, 180, DefaultLabHeight, this->boxSourceParam->getContent(), MinElevSource, MaxElevSource, ShowSliderInter);
+    
+    this->labHeightSour         = addLabel("Height", "Height Selected Source", 0, 96, DefaultLabWidth, DefaultLabHeight, this->boxSourceParam->getContent());
+    this->togLinkHeightSour     = addToggleButton("Link", "Link other sources", 90, 94, DefaultLabWidth, DefaultLabHeight,  this->boxSourceParam->getContent());
+    this->sliHeightSour         = addSlider("", "", 4, 116, 180, DefaultLabHeight, this->boxSourceParam->getContent(), MinHeigSource, MaxHeigSource, ShowSliderInter);
     //-----------------------------
 
 
@@ -354,8 +358,11 @@ void SpatGrisAudioProcessorEditor::updateSourceParam()
     this->sliAzimSpan->setValue(*(this->filter->getListSource().at(idS)->getAzim()),    dontSendNotification);
     this->sliAzimSpan->setTooltip("A:"+String(this->sliAzimSpan->getValue(),2));
     
-    this->sliAElevSpann->setValue(*(this->filter->getListSource().at(idS)->getElev()),  dontSendNotification);
-    this->sliAElevSpann->setTooltip("E:"+String(this->sliAElevSpann->getValue(),2));
+    this->sliElevSpan->setValue(*(this->filter->getListSource().at(idS)->getElev()),  dontSendNotification);
+    this->sliElevSpan->setTooltip("E:"+String(this->sliElevSpan->getValue(),2));
+    
+    this->sliHeightSour->setValue(*(this->filter->getListSource().at(idS)->getHeigt()),  dontSendNotification);
+    this->sliHeightSour->setTooltip("E:"+String(this->sliHeightSour->getValue(),2));
 }
 
 
@@ -455,6 +462,9 @@ void SpatGrisAudioProcessorEditor::buttonClicked (Button *button)
         this->filter->setLinkElevation(this->togLinkElevSpan->getToggleState());
         
     }
+    else if(this->togLinkHeightSour == button){
+        this->filter->setLinkHeight(this->togLinkHeightSour->getToggleState());
+    }
     else if(this->togTrajRandSepare == button){
         this->filter->getTrajectory()->setRandSeparate(this->togTrajRandSepare->getToggleState());
         
@@ -484,9 +494,14 @@ void SpatGrisAudioProcessorEditor::sliderValueChanged (Slider *slider)
         this->sliAzimSpan->setTooltip("A:"+String(this->sliAzimSpan->getValue(),2));
         
     }
-    else if(this->sliAElevSpann == slider){
-        this->filter->setElevationValue(this->sliAElevSpann->getValue());
-        this->sliAElevSpann->setTooltip("E:"+String(this->sliAElevSpann->getValue(),2));
+    else if(this->sliElevSpan == slider){
+        this->filter->setElevationValue(this->sliElevSpan->getValue());
+        this->sliElevSpan->setTooltip("E:"+String(this->sliElevSpan->getValue(),2));
+        
+    }
+    else if(this->sliHeightSour == slider){
+        this->filter->setHeightSValue(this->sliHeightSour->getValue());
+        this->sliHeightSour->setTooltip("H:"+String(this->sliHeightSour->getValue(),2));
         
     }
     else if(this->sliSpeedTrajectory == slider){
