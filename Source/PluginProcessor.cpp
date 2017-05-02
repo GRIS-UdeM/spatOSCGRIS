@@ -285,9 +285,6 @@ void SpatGrisAudioProcessor::sendOscMessageValues()
                     float height_osc    = *this->getListSource().at(iCurSrc)->getHeigt();
                     float gain_osc      = 1;
                     
-                    if(isnan(azim_osc) || isnan(elev_osc) ){
-                        cout << azim_osc << newLine;
-                    }
                     OSCAddressPattern oscPattern("/spat/serv");
                     OSCMessage message(oscPattern);
                     
@@ -310,8 +307,8 @@ void SpatGrisAudioProcessor::sendOscMessageValues()
                 for(int iCurSrc = 0; iCurSrc < this->numSourceUsed; ++iCurSrc){
                     int   channel_osc   = this->oscFirstIdSource+iCurSrc-1;             //in gui the range is 1-99, for zirkonium it actually starts at 0 (or potentially lower, but Zirkosc uses 0 as starting channel)
                     FPoint rayAng       = getRayAngleSource(iCurSrc);
-                    float azim_osc      = rayAng.x;//For Zirkonium, -1 is in the back right and +1 in the back left. 0 is forward
-                    float elev_osc      = rayAng.y;//For Zirkonium, 0 is the edge of the dome, .5 is the top
+                    float azim_osc      = ((rayAng.y+(M_PI/2.0f))/M_PI) - 1.0f;                     //For Zirkonium, -1 is in the back right and +1 in the back left. 0 is forward
+                    float elev_osc      = 0.5f -  ((rayAng.x/2.0f)*0.5f);                     //For Zirkonium, 0 is the edge of the dome, .5 is the top
                     float azimspan_osc  = *this->getListSource().at(iCurSrc)->getAzim();     //min azim span is 0, max is 2. I figure this is radians.
                     float elevspan_osc  = *this->getListSource().at(iCurSrc)->getElev();     //min elev span is 0, max is .5
                     float gain_osc      = 1;                                //gain is just locked to max value

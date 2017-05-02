@@ -524,8 +524,6 @@ void SpatGrisAudioProcessorEditor::comboBoxChanged (ComboBox* comboBox)
     if(this->comMouvement == comboBox){
         this->filter->getSourceMover()->setMouvementMode((MouvementMode)this->comMouvement->getSelectedItemIndex());
         
-        
-        
     }
     else if(this->comTypeTrajectory == comboBox){
 
@@ -611,6 +609,21 @@ void SpatGrisAudioProcessorEditor::comboBoxChanged (ComboBox* comboBox)
     
     else if(this->comTypeProcess == comboBox){
         this->filter->setTypeProcess((ProcessType)this->comTypeProcess->getSelectedItemIndex());
+        
+        switch ((ProcessType)this->comTypeProcess->getSelectedItemIndex()) {
+                
+            case OSCZirkonium:
+                this->labHeightSour->setEnabled(false);
+                this->togLinkHeightSour->setEnabled(false);
+                this->sliHeightSour->setEnabled(false);
+                break;
+                
+            default:
+                this->labHeightSour->setEnabled(true);
+                this->togLinkHeightSour->setEnabled(true);
+                this->sliHeightSour->setEnabled(true);
+                break;
+        }
     }
 }
 
